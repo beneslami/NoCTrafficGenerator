@@ -47,7 +47,7 @@ void TrafficGenerator::Eject() {
         if(res.id >= 0) {
             //Add responses to list
             if(res.id > -1) {
-                //react(res);
+                react(res);
             }
         }
         //Check if there are more messages from the network
@@ -82,10 +82,28 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 
 void TrafficGenerator::Run(unsigned int numCycles) {
     for(cycle = 0; cycle < numCycles; cycle++){
-        //Inject all of this cycles' messages into the network
+        /* 1-initiate message()
+         * 2- choose src & dst() -> uniform
+         * 3- queue the generated messages to corresponding queues
+         * 4- call Enqueue
+         * */
+
+        /*Inject all of this cycles' messages into the network
+         * 5- in Inject(), call DeQueue
+         * 6- call send_packet() to fill inTransitTransactions
+         * 7- queue cleanup
+         * */
         Inject();
 
-        //Eject from network
+        /*Eject from network
+         * 8- loop through all network's messages
+         * 9- in react() function, look inTransitPackets.find()
+         * 10- based on the packet type, push the packet into the destination queue
+         * */
         Eject();
+
+        /*
+         * 11- step the network
+         * */
     }
 }
