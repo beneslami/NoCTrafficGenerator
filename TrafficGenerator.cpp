@@ -7,7 +7,7 @@
 #include <map>
 #include <iostream>
 
-static unsigned long long cycle;
+extern unsigned long long numCycles;
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
 PacketQueue packet_queue;
@@ -26,13 +26,13 @@ void TrafficGenerator::sendPacket(InjectReqMsg &req) {
 }
 
 void TrafficGenerator::Inject() {
-    std::list<InjectReqMsg> packets = packet_queue.DeQueue(cycle);
+    std::list<InjectReqMsg> packets = packet_queue.DeQueue(numCycles);
     std::list<InjectReqMsg>::iterator it;
 
     for(it = packets.begin(); it != packets.end(); ++it) {
         sendPacket(*it);
     }
-    packet_queue.cleanUp(cycle);
+    packet_queue.cleanUp(numCycles);
 }
 
 void TrafficGenerator::Eject() {
@@ -80,8 +80,10 @@ void TrafficGenerator::react(EjectResMsg ePacket){
     }
 }
 
-void TrafficGenerator::Run(unsigned int numCycles) {
-    for(cycle = 0; cycle < numCycles; cycle++){
+void TrafficGenerator::Run() {
+    RandomGenerator::PoissonDistribution src = RandomGenerator::PoissonDistribution(7);
+    for(int cycle = 0; cycle < numCycles; cycle++){
+        std::cout << src.Generate() << std::endl;
         /* 1-initiate message()
          * 2- choose src & dst() -> uniform
          * 3- queue the generated messages to corresponding queues
@@ -93,14 +95,14 @@ void TrafficGenerator::Run(unsigned int numCycles) {
          * 6- call send_packet() to fill inTransitTransactions
          * 7- queue cleanup
          * */
-        Inject();
+        //Inject();
 
         /*Eject from network
          * 8- loop through all network's messages
          * 9- in react() function, look inTransitPackets.find()
          * 10- based on the packet type, push the packet into the destination queue
          * */
-        Eject();
+        //Eject();
 
         /*
          * 11- step the network

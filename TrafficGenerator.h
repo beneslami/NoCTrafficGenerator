@@ -7,6 +7,7 @@
 
 #include "PacketQueue.h"
 #include "MessageType.h"
+#include "RandomGenerator.h"
 
 #define READ_REQUEST    1
 #define WRITE_REQUEST   0
@@ -15,7 +16,10 @@
 
 class TrafficGenerator {
 public:
-    void Run(unsigned int numCycles);
+    TrafficGenerator(){
+        std::cout << "TGen\n";
+    }
+    void Run();
     void Inject();
     void Eject();
     void sendPacket(InjectReqMsg&);
