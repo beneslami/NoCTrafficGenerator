@@ -10,8 +10,8 @@
 #include <map>
 
 namespace RandomGenerator {
-    std::random_device rd;
-    std::mt19937 mt_rng(rd());
+    static std::random_device rd;
+    static std::mt19937 mt_rng(rd());
 
     class BernoulliDistribution{
     public:
@@ -87,6 +87,21 @@ namespace RandomGenerator {
     private:
         double _lambda;
         int _intervals;
+        std::exponential_distribution<double>* dist;
+    };
+
+    class PoissonDistribution{
+    public:
+        PoissonDistribution(double lambda){
+            _lambda = lambda;
+        }
+        int Generate(){
+            std::poisson_distribution<int> dist(_lambda);
+            return dist(mt_rng);
+        }
+    private:
+        int _lambda;
+        std::poisson_distribution<int>* dist;
     };
 };
 
