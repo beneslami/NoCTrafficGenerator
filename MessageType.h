@@ -14,8 +14,8 @@
 
 struct InjectReqMsg{
     InjectReqMsg(){
-        size = sizeof(InjectReqMsg);
-        type = INJECT_REQ;
+        int size = sizeof(InjectReqMsg);
+        int type = INJECT_REQ;
     }
     int source;
     int dest;
@@ -31,22 +31,22 @@ struct InjectReqMsg{
 
 struct InjectResMsg{
     InjectResMsg(){
-        size = sizeof(InjectResMsg);
-        type = INJECT_RES;
+        int size = sizeof(InjectResMsg);
+        int type = INJECT_RES;
     }
 };
 
 struct EjectReqMsg{
     EjectReqMsg(){
-        size = sizeof(EjectReqMsg);
-        type = EJECT_REQ;
+        int size = sizeof(EjectReqMsg);
+        int type = EJECT_REQ;
     }
 };
 
 struct EjectResMsg{
     EjectResMsg(){
-        size = sizeof(EjectResMsg);
-        type = EJECT_RES;
+        int size = sizeof(EjectResMsg);
+        int type = EJECT_RES;
     }
     int id;
     int remainingRequests;
