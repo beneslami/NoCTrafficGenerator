@@ -13,19 +13,14 @@
 #define EJECT_RES  		3
 
 struct InjectReqMsg{
-    InjectReqMsg(){
-        int size = sizeof(InjectReqMsg);
-        int type = INJECT_REQ;
-    }
     int source;
     int dest;
     int id;
     int packetSize;
     int network;
     int cl;
-    int miss_pred;
+    int type;
     int msgType;
-    int coType;
     unsigned long long address;
 };
 
