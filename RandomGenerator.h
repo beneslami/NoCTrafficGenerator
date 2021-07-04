@@ -120,14 +120,11 @@ namespace RandomGenerator {
 
     class CustomDistribution{
     public:
-        CustomDistribution(){
-            distribution[8] = 19798;
-            //distribution[33.6] = 6217;
-            //distribution[59.2] = 9348;
-            //distribution[84.8] = 10842;
-            //distribution[110.4] = 18402;
-            distribution[136] = 95318;
+        CustomDistribution(std::map<double, double> bytes){
             std::map<double, double>::iterator it;
+            for(it = bytes.begin(); it != bytes.end(); ++it){
+                distribution[it->first] = it->second;
+            }
             int range = 0;
             for(it = distribution.begin(); it != distribution.end(); ++it){
                 range += it->second;
