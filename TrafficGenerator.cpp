@@ -6,8 +6,11 @@
 #include <list>
 #include <map>
 #include <iostream>
+#include <fstream>
 
 extern unsigned long long numCycles;
+extern int numCores;
+int window = 5;
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
 PacketQueue packet_queue;
@@ -81,11 +84,36 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 }
 
 void TrafficGenerator::Run() {
-    RandomGenerator::PoissonDistribution src = RandomGenerator::PoissonDistribution(7);
-    for(int cycle = 0; cycle < numCycles; cycle++){
-        std::cout << src.Generate() << std::endl;
-        /* 1-initiate message()
-         * 2- choose src & dst() -> uniform
+    std::ofstream myfile;
+    myfile.open ("example.txt");
+    int cycle = 1;
+    while(cycle < numCycles){
+        RandomGenerator::PoissonDistribution src_msgNum = RandomGenerator::PoissonDistribution(2.2);;
+        RandomGenerator::UniformDistribution dst = RandomGenerator::UniformDistribution(0, 3);;
+        RandomGenerator::BernoulliDistribution msgType = RandomGenerator::BernoulliDistribution(0.3);;
+
+        for (int src = 0; src < numCores; src++){
+            InjectReqMsg message;
+            int source = src;
+            int destination = dst.Generate();
+            int numOfMsg = src_msgNum.Generate();
+            if(numOfMsg != 0) {
+                if (destination != src) {
+                    RandomGenerator::CustomDistribution c;
+                    message.source = source;
+                    message.dest = destination;
+                    message.packetSize = c.Generate();
+                    message.network = 0;
+                    message.id = messageId;
+                    message.address = 0;
+                    myfile << cycle << "," << message.packetSize << std::endl;
+                }
+            }
+        }
+        cycle += 1;
+
+
+        /*
          * 3- queue the generated messages to corresponding queues
          * 4- call Enqueue
          * */
@@ -108,4 +136,6 @@ void TrafficGenerator::Run() {
          * 11- step the network
          * */
     }
+    myfile.close();
 }
+

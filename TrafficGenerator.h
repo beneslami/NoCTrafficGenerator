@@ -9,15 +9,14 @@
 #include "MessageType.h"
 #include "RandomGenerator.h"
 
-#define READ_REQUEST    1
-#define WRITE_REQUEST   0
+#define READ_REQUEST    0
+#define WRITE_REQUEST   1
 #define READ_REPLY      2
 #define WRITE_REPLY     3
 
 class TrafficGenerator {
 public:
     TrafficGenerator(){
-        std::cout << "TGen\n";
     }
     void Run();
     void Inject();
