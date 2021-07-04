@@ -15,6 +15,10 @@ namespace RandomGenerator {
 
     class BernoulliDistribution{
     public:
+        BernoulliDistribution(){
+
+        }
+
         BernoulliDistribution(double p) {
             dist = new std::bernoulli_distribution(p);
         }
@@ -36,6 +40,10 @@ namespace RandomGenerator {
 
     class UniformDistribution{
     public:
+        UniformDistribution(){
+
+        }
+
         UniformDistribution(int min, int max) {
             dist = new std::uniform_int_distribution<int>(min, max);
         }
@@ -74,9 +82,12 @@ namespace RandomGenerator {
 
     class ExponentialDistribution{
     public:
-        ExponentialDistribution(double lambda, int intervals){
+        ExponentialDistribution(){
+
+        }
+
+        ExponentialDistribution(double lambda){
             _lambda = lambda;
-            _intervals = intervals;
         }
 
         double Generate(){
@@ -86,12 +97,15 @@ namespace RandomGenerator {
 
     private:
         double _lambda;
-        int _intervals;
         std::exponential_distribution<double>* dist;
     };
 
     class PoissonDistribution{
     public:
+        PoissonDistribution(){
+
+        }
+
         PoissonDistribution(double lambda){
             _lambda = lambda;
         }
@@ -102,6 +116,45 @@ namespace RandomGenerator {
     private:
         int _lambda;
         std::poisson_distribution<int>* dist;
+    };
+
+    class CustomDistribution{
+    public:
+        CustomDistribution(){
+            distribution[8] = 19798;
+            //distribution[33.6] = 6217;
+            //distribution[59.2] = 9348;
+            //distribution[84.8] = 10842;
+            //distribution[110.4] = 18402;
+            distribution[136] = 95318;
+            std::map<double, double>::iterator it;
+            int range = 0;
+            for(it = distribution.begin(); it != distribution.end(); ++it){
+                range += it->second;
+            }
+            for(it = distribution.begin(); it != distribution.end(); ++it){
+                cdf[it->first] = it->second/range;
+            }
+        }
+
+        ~CustomDistribution(){
+
+        }
+
+        double Generate(){
+            std::uniform_real_distribution<double> dist = std::uniform_real_distribution<double>(0, 1);
+            double prob = dist(mt_rng);
+            for(auto it = cdf.begin(); it != cdf.end(); ++it){
+                if(prob <= it->second){
+                    return it->first;
+                }
+            }
+        }
+
+    private:
+        std::map<double, double> distribution;
+        std::discrete_distribution<double>* dist;
+        std::map<double, double> cdf;
     };
 };
 
