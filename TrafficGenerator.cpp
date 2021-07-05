@@ -312,34 +312,47 @@ void TrafficGenerator::Run() {
     b.insert(std::pair<double, double>(1239, 1));
     RandomGenerator::CustomDistribution byte_136 = RandomGenerator::CustomDistribution(b);
 
-
+    std::map<int, int>traffic;
+    std::map<int, int>::iterator pointer;
     while(cycle < numCycles){
+        int threshold;
         for (int src = 0; src < numCores; src++){
             int source = src;
             int destination = dst.Generate();
+            while(source == destination){
+                destination = dst.Generate();
+            }
             if (destination != src) {
                 int byteInject = byte.Generate();
                 if(byteInject == 8){
+                    threshold = byte_8.Generate();
                     int i = 0;
-                    int threshold = byte_8.Generate();
                     while(i < threshold){
-                        myfile << cycle + i << "," << byteInject << std::endl;
-                        i += 1;
+                        if(traffic.find(cycle + i) != traffic.end()){
+                            traffic[cycle+i] += byteInject;
+                        }
+                        else{
+                            traffic[cycle+i] = byteInject;
+                        }
+                        i++;
                     }
-                    cycle += threshold;
                 }
                 else if(byteInject == 136){
+                    threshold = byte_136.Generate();
                     int i = 0;
-                    int threshold = byte_136.Generate();
                     while(i < threshold){
-                        myfile << cycle + i << "," << byteInject << std::endl;
-                        i += 1;
+                        if(traffic.find(cycle + i) != traffic.end()){
+                            traffic[cycle + i] += byteInject;
+                        }
+                        else{
+                            traffic[cycle + i] = byteInject;
+                        }
+                        i++;
                     }
-                    cycle += threshold;
                 }
             }
         }
-
+        cycle += threshold;
         /*
          * 3- queue the generated messages to corresponding queues
          * 4- call Enqueue
@@ -362,6 +375,10 @@ void TrafficGenerator::Run() {
         /*
          * 11- step the network
          * */
+    }
+
+    for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
+        myfile << pointer->first << "," << pointer->second << std::endl;
     }
     myfile.close();
 }
