@@ -92,7 +92,6 @@ void TrafficGenerator::Run() {
     b.insert(std::pair<double, double>(136.0, 95318.0));
     RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(b);
     RandomGenerator::UniformDistribution dst = RandomGenerator::UniformDistribution(0, 3);
-    RandomGenerator::BernoulliDistribution msgType = RandomGenerator::BernoulliDistribution(0.3);
 
     b.clear();
     b.insert(std::pair<double, double>(1, 1192));
@@ -131,8 +130,8 @@ void TrafficGenerator::Run() {
     b.insert(std::pair<double, double>(41, 1));
     b.insert(std::pair<double, double>(143, 1));
     b.insert(std::pair<double, double>(332, 1));
-    //RandomGenerator::CustomDistribution byte_8 = RandomGenerator::CustomDistribution(b);
-    RandomGenerator::ExponentialDistribution byte_8 = RandomGenerator::ExponentialDistribution(1/3.59);
+    RandomGenerator::CustomDistribution byte_8 = RandomGenerator::CustomDistribution(b);
+
     b.clear();
     b.insert(std::pair<double, double>(1, 1090));
     b.insert(std::pair<double, double>(2, 647));
@@ -311,8 +310,8 @@ void TrafficGenerator::Run() {
     b.insert(std::pair<double, double>(488, 1));
     b.insert(std::pair<double, double>(497, 1));
     b.insert(std::pair<double, double>(1239, 1));
-    //RandomGenerator::CustomDistribution byte_136 = RandomGenerator::CustomDistribution(b);
-    RandomGenerator::ExponentialDistribution byte_136 = RandomGenerator::ExponentialDistribution(1/17.76);
+    RandomGenerator::CustomDistribution byte_136 = RandomGenerator::CustomDistribution(b);
+
 
     while(cycle < numCycles){
         for (int src = 0; src < numCores; src++){

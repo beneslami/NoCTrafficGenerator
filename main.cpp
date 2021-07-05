@@ -6,13 +6,14 @@
 #include <string>
 #include <chrono>
 #include "TrafficGenerator.h"
+#include "RandomGenerator.h"
 
 unsigned long long numCycles;
 int numCores;
 
 int main(int argc, char **argv){
     if(argc < 3) {
-        std::cerr << "Need 2 parameters: [MODEL FILE] [DURATION IN CYCLE]" << std::endl;
+        std::cerr << "Need 3 parameters: [MODEL FILE] [DURATION IN CYCLE] [NUMBER OF CORE]" << std::endl;
         return -1;
     }
     numCycles = std::stoull(argv[2]);
@@ -23,5 +24,6 @@ int main(int argc, char **argv){
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
     std::cout << "duration: " << duration.count() <<"s\n";
+
     return 0;
 }

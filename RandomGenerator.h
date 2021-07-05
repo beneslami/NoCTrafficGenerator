@@ -129,8 +129,14 @@ namespace RandomGenerator {
             for(it = distribution.begin(); it != distribution.end(); ++it){
                 range += it->second;
             }
+
             for(it = distribution.begin(); it != distribution.end(); ++it){
-                cdf[it->first] = it->second/range;
+                pdf[it->first] = it->second/range;
+            }
+            double prev = 0;
+            for(it = pdf.begin(); it != pdf.end(); ++it){
+                cdf[it->first] = it->second + prev;
+                prev = cdf[it->first];
             }
         }
 
@@ -152,6 +158,7 @@ namespace RandomGenerator {
         std::map<double, double> distribution;
         std::discrete_distribution<double>* dist;
         std::map<double, double> cdf;
+        std::map<double, double> pdf;
     };
 };
 
