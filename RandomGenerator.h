@@ -144,6 +144,12 @@ namespace RandomGenerator {
 
         }
 
+        void show(){
+            std::map<double, double>::iterator it;
+            for(it = this->pdf.begin(); it != this->pdf.end(); ++it){
+                std::cout << it->first << ": " << it->second << std::endl;
+            }
+        }
         double Generate(){
             std::uniform_real_distribution<double> dist = std::uniform_real_distribution<double>(0, 1);
             double prob = dist(mt_rng);
