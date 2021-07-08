@@ -3,6 +3,8 @@
 //
 
 #include "TrafficGenerator.h"
+#include "ReadFile.h"
+#include "globals.h"
 #include <list>
 #include <map>
 #include <iostream>
@@ -87,13 +89,19 @@ void TrafficGenerator::Run() {
     std::ofstream myfile;
     myfile.open ("example.txt");
     int cycle = 1;
-    std::map<double, double>b;
-    b.insert(std::pair<double, double>(0.0, 84884.0));
-    b.insert(std::pair<double, double>(8.0, 19798.0));
-    b.insert(std::pair<double, double>(136.0, 95318.0));
-    RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(b);
+    RandomGenerator::UniformDistribution dst;
+    if(!destin.compare("uniform")){
+        RandomGenerator::UniformDistribution dst = RandomGenerator::UniformDistribution(0, numCores-1);
+    }
+    else if(!destin.compare("normal")){
+        RandomGenerator::UniformDistribution dst = RandomGenerator::UniformDistribution(0, numCores-1);
+    }
+
+    RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
     byte.show();
-    RandomGenerator::UniformDistribution dst = RandomGenerator::UniformDistribution(0, 3);
+
+    /*
+
 
     b.clear();
     b.insert(std::pair<double, double>(1, 76420));
@@ -189,7 +197,8 @@ void TrafficGenerator::Run() {
     b.insert(std::pair<double, double>(70, 1));
     b.insert(std::pair<double, double>(101, 1));
     RandomGenerator::CustomDistribution byte_136 = RandomGenerator::CustomDistribution(b);
-
+    */
+    /*
     std::map<int, int>traffic;
     std::map<int, int>::iterator pointer;
     while(cycle < numCycles){
@@ -244,33 +253,11 @@ void TrafficGenerator::Run() {
             }
         }
         cycle += threshold;
-        /*
-         * 3- queue the generated messages to corresponding queues
-         * 4- call Enqueue
-         * */
-
-        /*Inject all of this cycles' messages into the network
-         * 5- in Inject(), call DeQueue
-         * 6- call send_packet() to fill inTransitTransactions
-         * 7- queue cleanup
-         * */
-        //Inject();
-
-        /*Eject from network
-         * 8- loop through all network's messages
-         * 9- in react() function, look inTransitPackets.find()
-         * 10- based on the packet type, push the packet into the destination queue
-         * */
-        //Eject();
-
-        /*
-         * 11- step the network
-         * */
     }
 
     for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
         myfile << pointer->first << "," << pointer->second << std::endl;
-    }
+    }*/
     myfile.close();
 }
 
