@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 #include <vector>
-std::vector<int>byteValue;
 
 
 void destinationModel(std::ifstream& modelFile){
@@ -21,7 +20,6 @@ void destinationModel(std::ifstream& modelFile){
         else if (!temp.compare("normal")){
             destin = "normal";
         }
-        std::cout << destin << std::endl;
         while(!temp.compare("DESTINATION_DISTRIBUTION-END")){
             modelFile >> temp;
             /*  in case the destination distribution needs more data, add the processing code for destination
@@ -37,29 +35,53 @@ void byteModel(std::ifstream& modelFile){
     while(temp.compare("BYTE_DISTRIBUTION-BEGIN") != 0){
         modelFile >> temp;
     }
-    if(temp.compare("BYTE_DISTRIBUTION-BEGIN") == 0){
-        //while(temp.compare("BYTE_DISTRIBUTION-END") != 0){
-        std::string b, freq;
-        modelFile >> b;
-        std::cout << b << std::endl;
-        modelFile >> freq;
-        std::cout << freq << std::endl;
-
-
+    if(temp.compare("BYTE_DISTRIBUTION-BEGIN") == 0) {
+        modelFile >> temp;
+        while(temp.compare("BYTE_DISTRIBUTION-END") != 0){
+            double a = std::stod(temp);
+            byteValue.push_back(a);
+            modelFile >> temp;
+            double b = std::stod(temp);
+            bytes.insert(std::pair<double, double>(a, b));
+            modelFile >> temp;
+        }
     }
 }
 
-void durationModel(std::ifstream& modelFile){
+void durationModel(std::ifstream& modelFile, std::string header, int bt){
 
+    std::string head = header;
+    head = head.append("BEGIN");
+    std::string tail = header.append("END");
+    std::map<double, double> temporaryList;
+    std::string temp;
+    modelFile >> temp;
+    while(temp.compare(head) != 0){
+        modelFile >> temp;
+    }
+    if(temp.compare(head) == 0) {
+        modelFile >> temp;
+        while(temp.compare(tail) != 0){
+            double a = std::stod(temp);
+            modelFile >> temp;
+            double b = std::stod(temp);
+            temporaryList.insert(std::pair<double, double>(a, b));
+            modelFile >> temp;
+        }
+    }
+    duration.insert(std::pair<int, std::map<double, double> >(bt, temporaryList));
+    temporaryList.clear();
+    head.clear();
+    tail.clear();
 }
 void readModel(std::ifstream& modelFile){
-    std::cout << "Reading model\n";
-    int pos = 0;
     destinationModel(modelFile);
     byteModel(modelFile);
-    /*int i = byteValue.pop_back();
-    while(i > -1){
-        durationModel(modelFile);
-        i = byteValue.pop_back();
-    }*/
+    for(int i=0; i< byteValue.size(); i++){
+        std::string header;
+        header.append("BYTE_");
+        header.append(std::to_string(byteValue.at(i)));
+        header.append("_INTERARRIVAL_DISTRIBUTION-");
+        durationModel(modelFile, header, byteValue.at(i));
+    }
 }
