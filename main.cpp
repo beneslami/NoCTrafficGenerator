@@ -9,9 +9,7 @@
 #include "TrafficGenerator.h"
 #include "RandomGenerator.h"
 #include "ReadFile.h"
-
-unsigned long long numCycles;
-int numCores;
+#include "globals.h"
 
 int main(int argc, char **argv){
     if(argc < 3) {
