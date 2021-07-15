@@ -24,10 +24,10 @@ int main(int argc, char **argv){
     }
     numCycles = std::stoull(argv[2]);
     numCores = std::stoi(argv[3]);
-    readModel(modelFile);
+    readModel2(modelFile);
     TrafficGenerator TGen = TrafficGenerator();
     auto start = std::chrono::high_resolution_clock::now();
-    TGen.Run();
+    TGen.Run2();
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
     std::cout << "duration: " << duration.count() <<"s\n";
