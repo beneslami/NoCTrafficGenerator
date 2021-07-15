@@ -14,6 +14,9 @@ extern std::map<int, int>traffic;
 extern std::string destin;
 extern std::vector<int>byteValue;
 
+extern std::vector<int>window_num;
+extern std::map<double, double>normal_stat;
+
 extern unsigned long long numCycles;
 extern int numCores;
 

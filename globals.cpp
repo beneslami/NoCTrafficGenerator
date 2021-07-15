@@ -11,5 +11,8 @@ std::map<int, int>traffic;
 std::string destin;
 std::vector<int>byteValue;
 
+std::vector<int>window_num;
+std::map<double, double>normal_stat;
+
 unsigned long long numCycles;
 int numCores;
