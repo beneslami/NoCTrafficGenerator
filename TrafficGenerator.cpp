@@ -85,60 +85,93 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 void TrafficGenerator::Run() {
     std::ofstream myfile;
     myfile.open ("example.txt");
-    int cycle = 1;
-    RandomGenerator::UniformDistribution dst;
-    if(!destin.compare("uniform")){
-        dst = RandomGenerator::UniformDistribution(0, numCores-1);
-    }
-    else if(!destin.compare("normal")){
-        dst = RandomGenerator::UniformDistribution(0, numCores-1);
-    }
-
-    RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
-
-    std::map<int, RandomGenerator::CustomDistribution> inter_arrival;
-    std::map<int, std::map<double, double> >::iterator it;
-    for(it = duration.begin(); it != duration.end(); ++it){
-        RandomGenerator::CustomDistribution temp = RandomGenerator::CustomDistribution(it->second);
-        inter_arrival.insert(std::pair<int, RandomGenerator::CustomDistribution>(it->first, temp));
-    }
-    /*std::map<int, RandomGenerator::CustomDistribution>::iterator i;
-    for(i = inter_arrival.begin(); i != inter_arrival.end(); ++i){
-        std::cout << i->first << std::endl;
-    }*/
-
     std::map<int, int>traffic;
     std::map<int, int>::iterator pointer;
-    while(cycle < numCycles){
-        int threshold;
-        for (int src = 0; src < numCores; src++) {
-            int source = src;
-            int destination = dst.Generate();
-            while (source == destination) {
-                destination = dst.Generate();
+    int cycle = 1;
+    if(numCores == 1){
+        RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
+        std::map<int, RandomGenerator::CustomDistribution> inter_arrival;
+        std::map<int, std::map<double, double> >::iterator it;
+        for(it = duration.begin(); it != duration.end(); ++it){
+            RandomGenerator::CustomDistribution temp = RandomGenerator::CustomDistribution(it->second);
+            inter_arrival.insert(std::pair<int, RandomGenerator::CustomDistribution>(it->first, temp));
+        }
+        while(cycle < numCycles){
+            int threshold;
+            int byteInject = byte.Generate();
+            threshold = inter_arrival.at(byteInject).Generate();
+            int i = 0;
+            while(i < threshold){
+                if(traffic.find(cycle + i) != traffic.end()){
+                    traffic[cycle + i] += byteInject;
+                }
+                else{
+                    traffic[cycle + i] = byteInject;
+                }
+                i++;
             }
-            if (destination != src) {
-                int byteInject = byte.Generate();
-                threshold = inter_arrival.at(byteInject).Generate();
-                int i = 0;
-                while(i < threshold){
-                    if(traffic.find(cycle + i) != traffic.end()){
-                        traffic[cycle + i] += byteInject;
+            cycle += threshold;
+        }
+    }
+    else{
+        RandomGenerator::UniformDistribution dst;
+        if(!destin.compare("uniform")){
+            dst = RandomGenerator::UniformDistribution(0, numCores-1);
+        }
+        else if(!destin.compare("normal")){
+            dst = RandomGenerator::UniformDistribution(0, numCores-1);
+        }
+
+        RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
+
+        std::map<int, RandomGenerator::CustomDistribution> inter_arrival;
+        std::map<int, std::map<double, double> >::iterator it;
+        for(it = duration.begin(); it != duration.end(); ++it){
+            RandomGenerator::CustomDistribution temp = RandomGenerator::CustomDistribution(it->second);
+            inter_arrival.insert(std::pair<int, RandomGenerator::CustomDistribution>(it->first, temp));
+        }
+        /*std::map<int, RandomGenerator::CustomDistribution>::iterator i;
+        for(i = inter_arrival.begin(); i != inter_arrival.end(); ++i){
+            std::cout << i->first << std::endl;
+        }*/
+        while(cycle < numCycles) {
+            int threshold;
+            for (int src = 0; src < numCores; src++) {
+                int source = src;
+                int destination = dst.Generate();
+                while (source == destination) {
+                    destination = dst.Generate();
+                }
+                if (destination != src) {
+                    int byteInject = byte.Generate();
+                    threshold = inter_arrival.at(byteInject).Generate();
+                    int i = 0;
+                    while (i < threshold) {
+                        if (traffic.find(cycle + i) != traffic.end()) {
+                            traffic[cycle + i] += byteInject;
+                        } else {
+                            traffic[cycle + i] = byteInject;
+                        }
+                        i++;
                     }
-                    else{
-                        traffic[cycle +i ] = byteInject;
-                    }
-                    i++;
                 }
             }
+            cycle += threshold;
         }
-        cycle += threshold;
     }
-
     for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
        myfile << pointer->first << "," << pointer->second << std::endl;
    }
-
     myfile.close();
 }
 
+void TrafficGenerator::Run2() {
+    //std::ofstream myfile;
+    //myfile.open ("example.txt");
+    std::map<int, int>traffic;
+    int cycle = 1;
+    std::map<double, double>::iterator it;
+    for(it = normal_stat.begin(); it != normal_stat.end(); ++it){
+        std::cout << it->first << "\t" << it->second << std::endl;
+    }
+}

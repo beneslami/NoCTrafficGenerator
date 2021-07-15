@@ -19,6 +19,7 @@ public:
     TrafficGenerator(){
     }
     void Run();
+    void Run2();
     void Inject();
     void Eject();
     void sendPacket(InjectReqMsg&);
