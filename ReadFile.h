@@ -9,6 +9,6 @@
 #include <iostream>
 
 void readModel(std::ifstream& modelFile);
-
+void readModel2(std::ifstream& modelFile);
 
 #endif
