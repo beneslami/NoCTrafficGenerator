@@ -85,7 +85,6 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 void TrafficGenerator::Run() {
     std::ofstream myfile;
     myfile.open ("example.txt");
-    std::map<int, int>traffic;
     std::map<int, int>::iterator pointer;
     int cycle = 1;
     if(numCores == 1){
@@ -154,24 +153,85 @@ void TrafficGenerator::Run() {
                         }
                         i++;
                     }
+                    std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle + i << std::endl;
+                    cycle += threshold;
                 }
             }
-            cycle += threshold;
         }
     }
     for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
        myfile << pointer->first << "," << pointer->second << std::endl;
-   }
+    }
     myfile.close();
 }
 
 void TrafficGenerator::Run2() {
-    //std::ofstream myfile;
-    //myfile.open ("example.txt");
+    std::ofstream myfile;
+    myfile.open ("example.txt");
     std::map<int, int>traffic;
     int cycle = 1;
-    std::map<double, double>::iterator it;
-    for(it = normal_stat.begin(); it != normal_stat.end(); ++it){
-        std::cout << it->first << "\t" << it->second << std::endl;
+    int counter = 0;
+    int rand;
+    int traffic_cycle = 0;
+    int source;
+    int destination;
+    std::map<int, std::map<float, float> >::iterator it;
+    std::map<float, float>::iterator it2;
+    if(numCores == 1) {
+        for(it = normal_stat.begin(); it != normal_stat.end(); ++it) {
+            for (it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+                while (counter < 5) {
+                    RandomGenerator::NormalDistribution normal = RandomGenerator::NormalDistribution(it2->first,
+                                                                                                     it2->second);
+                    rand = normal.generate();
+                    while (rand < 0) {
+                        rand = normal.generate();
+                    }
+                    traffic.insert(std::pair<int, int>(counter + cycle, rand));
+                    counter += 1;
+                }
+            }
+            cycle += counter;
+            counter = 0;
+        }
+    }
+    else {
+        RandomGenerator::UniformDistribution dst;
+        dst = RandomGenerator::UniformDistribution(0, numCores-1);
+        /*if(!destin.compare("uniform")){
+            dst = RandomGenerator::UniformDistribution(0, numCores-1);
+        }
+        else if(!destin.compare("normal")){
+            dst = RandomGenerator::UniformDistribution(0, numCores-1);
+        }*/
+        for(it = normal_stat.begin(); it != normal_stat.end(); ++it) {
+            for (it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+                while (counter < 5) {
+                    for(int src = 0; src < numCores; src++) {
+                        RandomGenerator::NormalDistribution normal = RandomGenerator::NormalDistribution(it2->first,
+                                                                                                         it2->second);
+                        source = src;
+                        destination = dst.Generate();
+                        while (source == destination) {
+                            destination = dst.Generate();
+                        }
+                        rand = normal.generate();
+                        while (rand < 0) {
+                            rand = normal.generate();
+                        }
+                        traffic_cycle += rand;
+                        std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << rand << "\tcycle: " << cycle + counter << std::endl;
+                    }
+                    traffic.insert(std::pair<int, int>(counter + cycle, traffic_cycle));
+                    counter += 1;
+                }
+            }
+            cycle += counter;
+            counter = 0;
+        }
+    }
+    std::map<int, int>::iterator it3;
+    for(it3 = traffic.begin(); it3 != traffic.end(); ++it3){
+        myfile << it3->first << ", " << it3->second << std::endl;
     }
 }
