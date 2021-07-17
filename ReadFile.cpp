@@ -92,6 +92,7 @@ void readModel2(std::ifstream& modelFile){
     std::vector<std::string> lines;
     std::string temp;
     double mean, std;
+    int window_num;
     while(std::getline(modelFile, temp)){
         lines.push_back(temp);
     }
@@ -99,14 +100,14 @@ void readModel2(std::ifstream& modelFile){
     for(it = lines.begin(); it != lines.end(); ++it){
         std::stringstream str_stm;
         str_stm << *it;
-        int temp_int;
+        float temp_int;
         std::string temp_str;
         int counter  = 0;
         while(!str_stm.eof()){
             str_stm >> temp_str;
             if(std::stringstream(temp_str) >> temp_int){
                 if(counter == 0){
-                    window_num.push_back(temp_int);
+                    window_num = temp_int;
                     counter += 1;
                 }
                 else if(counter == 1){
@@ -115,7 +116,9 @@ void readModel2(std::ifstream& modelFile){
                 }
                 else if(counter == 2){
                     std = temp_int;
-                    normal_stat.insert(std::pair<double, double>(mean, std));
+                    std::map<float, float>temp;
+                    temp.insert(std::pair<float, float>(mean, std));
+                    normal_stat.insert(std::pair<int, std::map<float, float> >(window_num, temp));
                     counter = 0;
                 }
             }
