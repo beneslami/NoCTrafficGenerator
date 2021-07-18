@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <algorithm>
 
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
@@ -84,8 +86,10 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 
 void TrafficGenerator::Run() {
     std::ofstream myfile;
+    std::vector<int>thresholds;
     myfile.open ("example.txt");
     std::map<int, int>::iterator pointer;
+    int traffic_cycle = 0;
     int cycle = 1;
     if(numCores == 1){
         RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
@@ -114,11 +118,14 @@ void TrafficGenerator::Run() {
     }
     else{
         RandomGenerator::UniformDistribution dst;
+        RandomGenerator::UniformDistribution src;
         if(!destin.compare("uniform")){
             dst = RandomGenerator::UniformDistribution(0, numCores-1);
+            src = RandomGenerator::UniformDistribution(0, numCores-1);
         }
         else if(!destin.compare("normal")){
             dst = RandomGenerator::UniformDistribution(0, numCores-1);
+            src = RandomGenerator::UniformDistribution(0, numCores-1);
         }
 
         RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
@@ -132,7 +139,7 @@ void TrafficGenerator::Run() {
         /*std::map<int, RandomGenerator::CustomDistribution>::iterator i;
         for(i = inter_arrival.begin(); i != inter_arrival.end(); ++i){
             std::cout << i->first << std::endl;
-        }*/
+        }
         while(cycle < numCycles) {
             int threshold;
             for (int src = 0; src < numCores; src++) {
@@ -145,18 +152,42 @@ void TrafficGenerator::Run() {
                     int byteInject = byte.Generate();
                     threshold = inter_arrival.at(byteInject).Generate();
                     int i = 0;
+                    thresholds.push_back(threshold);
                     while (i < threshold) {
-                        if (traffic.find(cycle + i) != traffic.end()) {
-                            traffic[cycle + i] += byteInject;
+                        if (traffic.find(cycle + i + 1) != traffic.end()) {
+                            traffic[cycle + i + 1] += byteInject;
                         } else {
-                            traffic[cycle + i] = byteInject;
+                            traffic[cycle + i + 1] = byteInject;
                         }
                         i++;
+                        std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle + i << std::endl;
                     }
-                    std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle + i << std::endl;
-                    cycle += threshold;
+                    cycle += *min_element(thresholds.begin(), thresholds.end());
+                    thresholds.clear();
                 }
             }
+        }
+         */
+        while(cycle < numCycles) {
+            int byteInject = byte.Generate();
+            int threshold = inter_arrival.at(byteInject).Generate();
+            thresholds.push_back(threshold);
+            int i = 0;
+            while(i < threshold){
+                int source = src.Generate();
+                int destination = dst.Generate();
+                while (source == destination) {
+                    destination = dst.Generate();
+                }
+                if (traffic.find(cycle + i + 1) != traffic.end()) {
+                    traffic[cycle + i + 1] += byteInject;
+                } else {
+                    traffic[cycle + i + 1] = byteInject;
+                }
+                //std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle << std::endl;
+                i++;
+            }
+            cycle += threshold;
         }
     }
     for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
@@ -168,7 +199,6 @@ void TrafficGenerator::Run() {
 void TrafficGenerator::Run2() {
     std::ofstream myfile;
     myfile.open ("example.txt");
-    std::map<int, int>traffic;
     int cycle = 1;
     int counter = 0;
     int rand;
