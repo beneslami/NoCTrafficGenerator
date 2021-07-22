@@ -10,9 +10,9 @@
 
 extern std::map<double, double>bytes;
 extern std::map<int, std::map<double, double> > duration;
-extern std::map<int, int>traffic;
+extern std::map<int, double>traffic;
 extern std::string destin;
-extern std::vector<int>byteValue;
+extern std::vector<float>byteValue;
 
 extern std::map<int, std::map<float, float> >normal_stat;
 

@@ -7,9 +7,9 @@
 
 std::map<double, double>bytes;
 std::map<int, std::map<double, double> > duration;
-std::map<int, int>traffic;
+std::map<int, double>traffic;
 std::string destin;
-std::vector<int>byteValue;
+std::vector<float>byteValue;
 
 std::vector<int>window_num;
 std::map<int, std::map<float, float> >normal_stat;
