@@ -4,10 +4,13 @@
 #include "globals.h"
 #include "TrafficGenerator.h"
 #include "ReadFile.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <iostream>
 #include <vector>
-#include<sstream>
+#include <sstream>
+#include <iomanip>
 
 void destinationModel(std::ifstream& modelFile){
     std::string temp;
@@ -38,7 +41,7 @@ void byteModel(std::ifstream& modelFile){
     if(temp.compare("BYTE_DISTRIBUTION-BEGIN") == 0) {
         modelFile >> temp;
         while(temp.compare("BYTE_DISTRIBUTION-END") != 0){
-            double a = std::stod(temp);
+            float a = std::stod(temp);
             byteValue.push_back(a);
             modelFile >> temp;
             double b = std::stod(temp);
@@ -48,7 +51,7 @@ void byteModel(std::ifstream& modelFile){
     }
 }
 
-void durationModel(std::ifstream& modelFile, std::string header, int bt){
+void durationModel(std::ifstream& modelFile, std::string header, double bt){
     std::string head = header;
     head = head.append("BEGIN");
     std::string tail = header.append("END");
@@ -69,7 +72,7 @@ void durationModel(std::ifstream& modelFile, std::string header, int bt){
             modelFile >> temp;
         }
     }
-    duration.insert(std::pair<int, std::map<double, double> >(bt, temporaryList));
+    duration.insert(std::pair<double, std::map<double, double> >(bt, temporaryList));
     temporaryList.clear();
     head.clear();
     tail.clear();
@@ -78,11 +81,14 @@ void durationModel(std::ifstream& modelFile, std::string header, int bt){
 void readModel(std::ifstream& modelFile){
     destinationModel(modelFile);
     byteModel(modelFile);
-    std::vector<int>::iterator i;
+    std::vector<float>::iterator i;
+    std::cout << std::fixed;
     for(i = byteValue.begin(); i != byteValue.end(); ++i){
         std::string header;
         header.append("BYTE_");
-        header.append(std::to_string(*i));
+        char a[10];
+        sprintf(a, "%.3f", *i);
+        header.append(a);
         header.append("_INTERARRIVAL_DISTRIBUTION-");
         durationModel(modelFile, header, *i);
     }
