@@ -88,7 +88,7 @@ void TrafficGenerator::Run() {
     std::ofstream myfile;
     std::vector<int>thresholds;
     myfile.open ("example.txt");
-    std::map<int, int>::iterator pointer;
+    std::map<int, double>::iterator pointer;
     int traffic_cycle = 0;
     int cycle = 1;
     if(numCores == 1){
@@ -101,7 +101,7 @@ void TrafficGenerator::Run() {
         }
         while(cycle < numCycles){
             int threshold;
-            int byteInject = byte.Generate();
+            double byteInject = byte.Generate();
             threshold = inter_arrival.at(byteInject).Generate();
             int i = 0;
             while(i < threshold){
@@ -260,7 +260,7 @@ void TrafficGenerator::Run2() {
             counter = 0;
         }
     }
-    std::map<int, int>::iterator it3;
+    std::map<int, double>::iterator it3;
     for(it3 = traffic.begin(); it3 != traffic.end(); ++it3){
         myfile << it3->first << ", " << it3->second << std::endl;
     }
