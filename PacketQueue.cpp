@@ -17,7 +17,7 @@ void PacketQueue::Enqueue(InjectReqMsg packet, int time) {
 }
 
 std::list<InjectReqMsg> PacketQueue::DeQueue(int time) {
-    queue[time].clear();
+    return queue[time];
 }
 
 void PacketQueue::cleanUp(int time) {
