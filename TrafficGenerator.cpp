@@ -12,10 +12,26 @@
 #include <vector>
 #include <algorithm>
 
+//Set this to 0 to debug without connecting to booksim
+#define CONNECT 0
+
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
 PacketQueue packet_queue;
 int messageId = 0;
+
+void TrafficGenerator::initiateMessage(int source, int destination, int packetSize, int time, int address) {
+    InjectReqMsg packet;
+    packet.source = source;
+    packet.dest = destination;
+    packet.cl = 0;
+    packet.network = 0;
+    packet.packetSize = packetSize;
+    packet.msgType = 0; // TODO: change the code to distinguish packet type
+    packet.address = address;
+    //std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle << std::endl;
+    packet_queue.Enqueue(packet, time);
+}
 
 void TrafficGenerator::sendPacket(InjectReqMsg &req) {
     req.id = messageId;
@@ -27,16 +43,20 @@ void TrafficGenerator::sendPacket(InjectReqMsg &req) {
     }
     messageId++;
     inTransitPackets[req.id] = req;
+#if CONNECT
+    InjectResMsg res;
+	m_channel << req >> res;
+#endif
 }
 
-void TrafficGenerator::Inject() {
-    std::list<InjectReqMsg> packets = packet_queue.DeQueue(numCycles);
+void TrafficGenerator::Inject(int time) {
+    std::list<InjectReqMsg> packets = packet_queue.DeQueue(time);
     std::list<InjectReqMsg>::iterator it;
 
     for(it = packets.begin(); it != packets.end(); ++it) {
         sendPacket(*it);
     }
-    packet_queue.cleanUp(numCycles);
+    packet_queue.cleanUp(time);
 }
 
 void TrafficGenerator::Eject() {
@@ -85,10 +105,10 @@ void TrafficGenerator::react(EjectResMsg ePacket){
 }
 
 void TrafficGenerator::Run() {
-    std::ofstream myfile;
+    //std::ofstream myfile;
     std::vector<int>thresholds;
-    myfile.open ("example.txt");
-    std::map<int, double>::iterator pointer;
+    //myfile.open ("example.txt");
+    //std::map<int, double>::iterator pointer;
     int traffic_cycle = 0;
     int cycle = 1;
     if(numCores == 1){
@@ -136,38 +156,7 @@ void TrafficGenerator::Run() {
             RandomGenerator::CustomDistribution temp = RandomGenerator::CustomDistribution(it->second);
             inter_arrival.insert(std::pair<int, RandomGenerator::CustomDistribution>(it->first, temp));
         }
-        /*std::map<int, RandomGenerator::CustomDistribution>::iterator i;
-        for(i = inter_arrival.begin(); i != inter_arrival.end(); ++i){
-            std::cout << i->first << std::endl;
-        }
-        while(cycle < numCycles) {
-            int threshold;
-            for (int src = 0; src < numCores; src++) {
-                int source = src;
-                int destination = dst.Generate();
-                while (source == destination) {
-                    destination = dst.Generate();
-                }
-                if (destination != src) {
-                    int byteInject = byte.Generate();
-                    threshold = inter_arrival.at(byteInject).Generate();
-                    int i = 0;
-                    thresholds.push_back(threshold);
-                    while (i < threshold) {
-                        if (traffic.find(cycle + i + 1) != traffic.end()) {
-                            traffic[cycle + i + 1] += byteInject;
-                        } else {
-                            traffic[cycle + i + 1] = byteInject;
-                        }
-                        i++;
-                        std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle + i << std::endl;
-                    }
-                    cycle += *min_element(thresholds.begin(), thresholds.end());
-                    thresholds.clear();
-                }
-            }
-        }
-         */
+
         while(cycle < numCycles) {
             int byteInject = byte.Generate();
             int threshold = inter_arrival.at(byteInject).Generate();
@@ -184,16 +173,22 @@ void TrafficGenerator::Run() {
                 } else {
                     traffic[cycle + i + 1] = byteInject;
                 }
-                //std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle << std::endl;
+                initiateMessage(source, destination, byteInject, cycle + i + 1, 11111);
                 i++;
             }
+            Inject(cycle + i + 1);
+            /*
+             * eject
+             */
             cycle += threshold;
         }
     }
-    for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
+    std::cout << packet_queue.Size() << std::endl;
+    std::cout << inTransitPackets.size() << std::endl;
+    /*for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
        myfile << pointer->first << "," << pointer->second << std::endl;
     }
-    myfile.close();
+    myfile.close();*/
 }
 
 void TrafficGenerator::Run2() {

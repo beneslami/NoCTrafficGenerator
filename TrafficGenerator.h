@@ -20,7 +20,7 @@ public:
     }
     void Run();
     void Run2();
-    void Inject();
+    void Inject(int);
     void Eject();
     void sendPacket(InjectReqMsg&);
     struct transaction_t {
@@ -35,6 +35,7 @@ public:
         transaction_t() : source(-1), dest(-1), acks_received(0), data_received(false){}
     };
     void react(EjectResMsg);
+    void initiateMessage(int, int, int, int, int);
 };
 
 #endif
