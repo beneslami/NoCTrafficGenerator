@@ -9,7 +9,6 @@
 #include <queue>
 #include "src/module.hpp"
 #include "src/config_utils.hpp"
-#include "src/trace_generator.hpp"
 #include "src/networks/network.hpp"
 
 struct RequestPacket {
@@ -40,7 +39,7 @@ private:
     int _dests;
 
 public:
-    Interface( const Configuration &config, const vector<BSNetwork *> & net );
+    Interface( const Configuration &config, const vector<Network *> & net );
     ~Interface();
 
     int Init();
@@ -50,8 +49,8 @@ public:
     RequestPacket *DequeueRequestPacket(int source, int network, int cl);
 
     int getReplyQueueSize() { return _reply_buffer.size(); }
-    int EnqueueReplyPacket(FeS2ReplyPacket *packet);
-    FeS2ReplyPacket *DequeueReplyPacket();
+    int EnqueueReplyPacket(ReplyPacket *packet);
+    ReplyPacket *DequeueReplyPacket();
 
     int GenerateTestPackets();
 };
