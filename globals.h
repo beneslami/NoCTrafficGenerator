@@ -8,6 +8,11 @@
 #include <map>
 #include <iostream>
 
+const int READ_REQUEST = 0;
+const int WRITE_REQUEST = 1;
+const int READ_REPLY = 2;
+const int WRITE_REPLY = 3;
+
 extern std::map<double, double>bytes;
 extern std::map<int, std::map<double, double> > duration;
 extern std::map<int, double>traffic;
