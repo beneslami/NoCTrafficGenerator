@@ -7,9 +7,11 @@
 
 #include <map>
 #include <queue>
-#include "src/module.hpp"
-#include "src/config_utils.hpp"
-#include "src/networks/network.hpp"
+#include "module.hpp"
+#include "config_utils.hpp"
+#include "networks/network.hpp"
+#include "netstream/messages.h"
+#include "netstream/socketstream.h"
 
 struct RequestPacket {
     int source;
@@ -18,7 +20,6 @@ struct RequestPacket {
     int size;
     int network;
     int cl;
-    int miss_pred;
 };
 
 struct ReplyPacket {
@@ -27,7 +28,6 @@ struct ReplyPacket {
     int id;
     int network;
     int cl;
-    int miss_pred;
 };
 
 class Interface {
@@ -37,7 +37,13 @@ private:
     map<int, int> _node_map;
     int _sources;
     int _dests;
-
+    int _duplicate_networks;
+    bool _concentrate;
+    std::string _host;
+    int _port;
+    SocketStream *_channel;
+    SocketStream _listenSocket;
+    map<int, int> _original_destinations;
 public:
     Interface( const Configuration &config, const vector<Network *> & net );
     ~Interface();
@@ -51,8 +57,6 @@ public:
     int getReplyQueueSize() { return _reply_buffer.size(); }
     int EnqueueReplyPacket(ReplyPacket *packet);
     ReplyPacket *DequeueReplyPacket();
-
-    int GenerateTestPackets();
 };
 
 
