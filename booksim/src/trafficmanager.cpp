@@ -39,6 +39,8 @@
 #include "random_utils.hpp" 
 #include "vc.hpp"
 #include "packet_reply_info.hpp"
+#include "TrafficGen.h"
+
 
 TrafficManager * TrafficManager::New(Configuration const & config,
                                      vector<Network *> const & net)
@@ -49,7 +51,9 @@ TrafficManager * TrafficManager::New(Configuration const & config,
         result = new TrafficManager(config, net);
     } else if(sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
-    } else {
+    } else if(sim_type == "mcm_gpu")
+        result = new TrafficGen(config, net);
+    else {
         cerr << "Unknown simulation type: " << sim_type << endl;
     } 
     return result;
