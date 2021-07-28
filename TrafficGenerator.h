@@ -8,11 +8,8 @@
 #include "PacketQueue.h"
 #include "MessageType.h"
 #include "RandomGenerator.h"
-
-#define READ_REQUEST    0
-#define WRITE_REQUEST   1
-#define READ_REPLY      2
-#define WRITE_REPLY     3
+#include "netstream/messages.h"
+#include "netstream/socketstream.h"
 
 class TrafficGenerator {
 public:
@@ -34,7 +31,6 @@ public:
         }
         transaction_t() : source(-1), dest(-1), acks_received(0), data_received(false){}
     };
-    void react(EjectResMsg);
     void initiateMessage(int, int, int, int, int);
 };
 

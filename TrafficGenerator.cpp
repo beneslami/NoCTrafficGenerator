@@ -1,24 +1,45 @@
 //
 // Created by Ben on 6/30/21.
 //
-
-#include "TrafficGenerator.h"
-#include "ReadFile.h"
-#include "globals.h"
-#include <list>
 #include <map>
-#include <iostream>
-#include <fstream>
+#include <list>
 #include <vector>
+#include <fstream>
+#include <iostream>
 #include <algorithm>
+#include "globals.h"
+#include "ReadFile.h"
+#include "TrafficGenerator.h"
 
 //Set this to 0 to debug without connecting to booksim
-#define CONNECT 0
+#define CONNECT 1
 
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
 PacketQueue packet_queue;
 int messageId = 0;
+SocketStream m_channel;
+
+void connect() {
+#if CONNECT
+    // connect to network simulator
+	m_channel.connect(NS_HOST, NS_PORT);
+
+	// send request to initialize
+	InitializeReqMsg req;
+	InitializeResMsg res;
+	m_channel << req >> res;
+#endif
+}
+
+void exit() {
+#if CONNECT
+    // Notify network we are quitting
+	QuitReqMsg req;
+	QuitResMsg res;
+	m_channel << req >> res;
+#endif
+}
 
 void TrafficGenerator::initiateMessage(int source, int destination, int packetSize, int time, int address) {
     InjectReqMsg packet;
@@ -27,10 +48,19 @@ void TrafficGenerator::initiateMessage(int source, int destination, int packetSi
     packet.cl = 0;
     packet.network = 0;
     packet.packetSize = packetSize;
-    packet.msgType = 0; // TODO: change the code to distinguish packet type
+    packet.msgType = 0;
     packet.address = address;
-    //std::cout << "src: " << source << "\tdst: " << destination << "\tbyte: " << byteInject << "\tcycle: "<< cycle << std::endl;
     packet_queue.Enqueue(packet, time);
+}
+
+void TrafficGenerator::Inject(int time) {
+    std::list<InjectReqMsg> packets = packet_queue.DeQueue(time);
+    std::list<InjectReqMsg>::iterator it;
+    for(it = packets.begin(); it != packets.end(); ++it) {
+        //std::cout << "source: " << it->source << "\tdestination: " << it->dest << "\tcycle: " << time << std::endl;
+        sendPacket(*it);
+    }
+    packet_queue.cleanUp(time);
 }
 
 void TrafficGenerator::sendPacket(InjectReqMsg &req) {
@@ -45,28 +75,57 @@ void TrafficGenerator::sendPacket(InjectReqMsg &req) {
     inTransitPackets[req.id] = req;
 #if CONNECT
     InjectResMsg res;
-	m_channel << req >> res;
+    m_channel << req >> res;
 #endif
+
 }
 
-void TrafficGenerator::Inject(int time) {
-    std::list<InjectReqMsg> packets = packet_queue.DeQueue(time);
-    std::list<InjectReqMsg>::iterator it;
-
-    for(it = packets.begin(); it != packets.end(); ++it) {
-        sendPacket(*it);
+void react(EjectResMsg ePacket) {
+    std::map<int, InjectReqMsg>::iterator it = inTransitPackets.find(ePacket.id);
+    if(it == inTransitPackets.end()) {
+        std::cerr << "Error: couldn't find in transit packet " << ePacket.id << std::endl;
+        exit(-1);
     }
-    packet_queue.cleanUp(time);
+
+    InjectReqMsg request = it->second;
+    InjectReqMsg response;
+    inTransitPackets.erase(it);
+
+    std::map<int, TrafficGenerator::transaction_t>::iterator trans = inTransitTransactions.find(request.address);
+
+    switch(request.msgType) {
+        case READ_REQUEST:
+            std::cout << "Read Request arrived\n";
+            break;
+        case READ_REPLY:
+            std::cout << "Read Reply arrived\n";
+            break;
+        case WRITE_REQUEST:
+            std::cout << "Write Request arrived\n";
+            break;
+        case WRITE_REPLY:
+            std::cout << "Write Reply arrived\n";
+            break;
+        default:
+            std::cout << "unKnown packet arrived\n";
+            break;
+    }
+
+
+    if(trans->second.Completed()) {
+        inTransitTransactions.erase(trans);
+    }
 }
 
 void TrafficGenerator::Eject() {
+#if CONNECT
     EjectReqMsg req; //The request to the network
     EjectResMsg res; //The response from the network
     bool hasRequests = true; //Whether there are more requests from the network
 
     //Loop through all the network's messages
     while(hasRequests) {
-        //m_channel << req >> res; SocketStream m_channel;
+        m_channel << req >> res;
 
         if(res.id >= 0) {
             //Add responses to list
@@ -77,39 +136,11 @@ void TrafficGenerator::Eject() {
         //Check if there are more messages from the network
         hasRequests = res.remainingRequests;
     }
-}
-
-void TrafficGenerator::react(EjectResMsg ePacket){
-    std::map<int, InjectReqMsg>::iterator it = inTransitPackets.find(ePacket.id);
-    if(it == inTransitPackets.end()) {
-        std::cerr << "Error: couldn't find in-transit packet " << ePacket.id << std::endl;
-        exit(-1);
-    }
-    InjectReqMsg request = it->second;
-    InjectReqMsg response;
-    inTransitPackets.erase(it);
-
-    std::map<int, transaction_t>::iterator trans = inTransitTransactions.find(request.address);
-
-    if(request.msgType == READ_REQUEST || request.msgType == WRITE_REQUEST) {
-
-     }
-
-    else if(request.msgType == READ_REPLY || request.msgType == WRITE_REPLY) {
-
-    }
-
-    if(trans->second.Completed()) {
-        inTransitTransactions.erase(trans);
-    }
+#endif
 }
 
 void TrafficGenerator::Run() {
-    //std::ofstream myfile;
     std::vector<int>thresholds;
-    //myfile.open ("example.txt");
-    //std::map<int, double>::iterator pointer;
-    int traffic_cycle = 0;
     int cycle = 1;
     if(numCores == 1){
         RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
@@ -137,6 +168,8 @@ void TrafficGenerator::Run() {
         }
     }
     else{
+        //Connect to network simulator
+        connect();
         RandomGenerator::UniformDistribution dst;
         RandomGenerator::UniformDistribution src;
         if(!destin.compare("uniform")){
@@ -162,33 +195,33 @@ void TrafficGenerator::Run() {
             int threshold = inter_arrival.at(byteInject).Generate();
             thresholds.push_back(threshold);
             int i = 0;
-            while(i < threshold){
-                int source = src.Generate();
-                int destination = dst.Generate();
-                while (source == destination) {
-                    destination = dst.Generate();
+            while(i < threshold){ //todo: still problematic
+                for(int j = 0; j < numCores; j++) {
+                    int source = src.Generate();
+                    int destination = dst.Generate();
+                    while (source == destination) {
+                        destination = dst.Generate();
+                    }
+                    /*if (traffic.find(cycle + i + 1) != traffic.end()) {
+                        traffic[cycle + i + 1] += byteInject;
+                    } else {
+                        traffic[cycle + i + 1] = byteInject;
+                    }*/
+                    initiateMessage(source, destination, byteInject, cycle + i + 1, 11111);
                 }
-                if (traffic.find(cycle + i + 1) != traffic.end()) {
-                    traffic[cycle + i + 1] += byteInject;
-                } else {
-                    traffic[cycle + i + 1] = byteInject;
-                }
-                initiateMessage(source, destination, byteInject, cycle + i + 1, 11111);
                 i++;
             }
             Inject(cycle + i + 1);
-            /*
-             * eject
-             */
+            Eject();
             cycle += threshold;
+#if CONNECT
+            StepReqMsg req;
+		    StepResMsg res;
+		    m_channel << req >> res;
+#endif
         }
     }
-    std::cout << packet_queue.Size() << std::endl;
-    std::cout << inTransitPackets.size() << std::endl;
-    /*for(pointer = traffic.begin(); pointer != traffic.end(); ++pointer){
-       myfile << pointer->first << "," << pointer->second << std::endl;
-    }
-    myfile.close();*/
+    exit();
 }
 
 void TrafficGenerator::Run2() {
