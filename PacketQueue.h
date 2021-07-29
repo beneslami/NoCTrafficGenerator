@@ -13,8 +13,8 @@ class PacketQueue {
 public:
     PacketQueue();
     virtual ~PacketQueue();
-    void Enqueue(InjectReqMsg packet, int time);
-    std::list<InjectReqMsg> DeQueue(int time);
+    void Enqueue(InjectReqMsg, int);
+    std::list<InjectReqMsg> DeQueue(int);
     void cleanUp(int time);
     int Size(){
         return queue.size();

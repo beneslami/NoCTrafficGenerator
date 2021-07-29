@@ -4,7 +4,6 @@
 
 #include "PacketQueue.h"
 #include <list>
-#include <map>
 
 PacketQueue::PacketQueue() {
 }
