@@ -273,8 +273,6 @@ void TrafficGen::_GeneratePacket(int source, int size, int cl, int time, int id,
                        << ") at time " << time
                        << "." << endl;
         }
-
-        // Record FeS2 data for when we eject
         f->data = (void*)payload;
         _partial_packets[source][cl].push_back(f);
     }
@@ -300,7 +298,7 @@ void TrafficGen::_Inject() {
                             _interface->EnqueueReplyPacket(rp);
                         } else {
                             //Divide packet into flits and send into booksim
-                            std::cout << "src: " << p->source << "\tdst: " << p->dest << "\tbyte: " << p->size << std::endl;
+                            //std::cout << "src: " << p->source << "\tdst: " << p->dest << "\tbyte: " << p->size << std::endl;
                             _GeneratePacket(input, p->size, c, _time, p->id, p->network, p->dest);
                         }
                     }
