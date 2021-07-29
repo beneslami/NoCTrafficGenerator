@@ -14,11 +14,12 @@
 //Set this to 0 to debug without connecting to booksim
 #define CONNECT 1
 
+static unsigned long long cycle;
 std::map<int, InjectReqMsg> inTransitPackets;
 std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
-PacketQueue packet_queue;
 int messageId = 0;
 SocketStream m_channel;
+PacketQueue packet_queue;
 
 void connect() {
 #if CONNECT
@@ -28,7 +29,12 @@ void connect() {
 	// send request to initialize
 	InitializeReqMsg req;
 	InitializeResMsg res;
+    std::cout << req.type <<": Sending Initiating packet to Booksim\n";
 	m_channel << req >> res;
+	if(res.size){
+	    std::cout << res.type <<": initiating Booksim and Traffic Generator done successfully\n";
+	}
+    std::cout << "==================Initialization Completed==================\n";
 #endif
 }
 
@@ -53,14 +59,13 @@ void TrafficGenerator::initiateMessage(int source, int destination, int packetSi
     packet_queue.Enqueue(packet, time);
 }
 
-void TrafficGenerator::Inject(int time) {
-    std::list<InjectReqMsg> packets = packet_queue.DeQueue(time);
+void TrafficGenerator::Inject() {
+    std::list<InjectReqMsg> packets = packet_queue.DeQueue(cycle);
     std::list<InjectReqMsg>::iterator it;
     for(it = packets.begin(); it != packets.end(); ++it) {
-        //std::cout << "source: " << it->source << "\tdestination: " << it->dest << "\tcycle: " << time << std::endl;
         sendPacket(*it);
     }
-    packet_queue.cleanUp(time);
+    packet_queue.cleanUp(cycle);
 }
 
 void TrafficGenerator::sendPacket(InjectReqMsg &req) {
@@ -70,14 +75,19 @@ void TrafficGenerator::sendPacket(InjectReqMsg &req) {
         inTransitTransactions[req.address].source = req.source;
         inTransitTransactions[req.address].dest = req.dest;
         inTransitTransactions[req.address].acks_received = 0;
+        inTransitTransactions[req.address].data_received = false; //TODO: check to see the type of packet
     }
     messageId++;
     inTransitPackets[req.id] = req;
 #if CONNECT
     InjectResMsg res;
     m_channel << req >> res;
+    if(res.size) {
+        std::cout << "1- src: " << req.source << "\tdst: " << req.dest << "\tid: " << req.id << "\ttype: " << req.type
+                  << "\tsize: " << req.size << "\tcycle: " << cycle << "\tsuccessfully injected to BookSim"
+                  << std::endl;
+    }
 #endif
-
 }
 
 void react(EjectResMsg ePacket) {
@@ -88,6 +98,8 @@ void react(EjectResMsg ePacket) {
     }
 
     InjectReqMsg request = it->second;
+    std::cout << "2- src: " << request.source << "\tdst: " << request.dest << "\tid: " << request.id << "\ttype: " << request.type
+              << "\tsize: " << request.size << "\tcycle: " << cycle << "\trequest received." << std::endl;
     InjectReqMsg response;
     inTransitPackets.erase(it);
 
@@ -111,7 +123,6 @@ void react(EjectResMsg ePacket) {
             break;
     }
 
-
     if(trans->second.Completed()) {
         inTransitTransactions.erase(trans);
     }
@@ -126,12 +137,14 @@ void TrafficGenerator::Eject() {
     //Loop through all the network's messages
     while(hasRequests) {
         m_channel << req >> res;
-
         if(res.id >= 0) {
             //Add responses to list
             if(res.id > -1) {
                 react(res);
             }
+        }
+        else{
+            std::cout << res.type << " :No packet from BookSim\n";
         }
         //Check if there are more messages from the network
         hasRequests = res.remainingRequests;
@@ -141,7 +154,6 @@ void TrafficGenerator::Eject() {
 
 void TrafficGenerator::Run() {
     std::vector<int>thresholds;
-    int cycle = 1;
     if(numCores == 1){
         RandomGenerator::CustomDistribution byte = RandomGenerator::CustomDistribution(bytes);
         std::map<int, RandomGenerator::CustomDistribution> inter_arrival;
@@ -192,6 +204,9 @@ void TrafficGenerator::Run() {
 
         while(cycle < numCycles) {
             int byteInject = byte.Generate();
+            while(byteInject == 0){
+                byteInject = byte.Generate();
+            }
             int threshold = inter_arrival.at(byteInject).Generate();
             thresholds.push_back(threshold);
             int i = 0;
@@ -202,16 +217,11 @@ void TrafficGenerator::Run() {
                     while (source == destination) {
                         destination = dst.Generate();
                     }
-                    /*if (traffic.find(cycle + i + 1) != traffic.end()) {
-                        traffic[cycle + i + 1] += byteInject;
-                    } else {
-                        traffic[cycle + i + 1] = byteInject;
-                    }*/
                     initiateMessage(source, destination, byteInject, cycle + i + 1, 11111);
                 }
                 i++;
             }
-            Inject(cycle + i + 1);
+            Inject();
             Eject();
             cycle += threshold;
 #if CONNECT

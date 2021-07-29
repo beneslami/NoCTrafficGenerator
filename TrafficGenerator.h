@@ -13,11 +13,10 @@
 
 class TrafficGenerator {
 public:
-    TrafficGenerator(){
-    }
+    TrafficGenerator(){}
     void Run();
     void Run2();
-    void Inject(int);
+    void Inject();
     void Eject();
     void sendPacket(InjectReqMsg&);
     struct transaction_t {
@@ -25,7 +24,6 @@ public:
         int dest;
         int acks_received;
         bool data_received;
-
         bool Completed() {
             return data_received;
         }
