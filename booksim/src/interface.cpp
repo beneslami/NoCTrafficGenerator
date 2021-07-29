@@ -49,7 +49,9 @@ int Interface::Init() {
     InitializeReqMsg req;
     InitializeResMsg res;
     *_channel >> req << res;
-
+    std::cout << req.type <<  ":Receiving initiation packet from Traffic Generator\n";
+    std::cout << res.type << ": Sending response to Traffic Generator\n";
+    std::cout << "==================Initialization Completed==================\n";
     return 0;
 }
 
@@ -61,7 +63,7 @@ int Interface::Step() {
     {
         // read message
         *_channel >> (StreamMessage*&) msg;
-        std::cout << "message: " << msg->type << std::endl;
+        std::cout << msg->type << std::endl;
         switch(msg->type)
         {
             case STEP_REQ:
@@ -70,10 +72,14 @@ int Interface::Step() {
                 // we're actually doing a little bit of work in parallel
                 StepResMsg res;
                 *_channel << res;
-
                 // fall-through and perform one step of BookSim loop
                 process_more = false;
-
+                break;
+            }
+            case INITIALIZE_REQ: {
+                std::cout << "Initiating Booksim and Traffic Generator\n";
+                InitializeResMsg res;
+                *_channel << res;
                 break;
             }
             case INJECT_REQ:
@@ -82,12 +88,13 @@ int Interface::Step() {
 
                 // create packet to store in local queue
                 RequestPacket* rp = new RequestPacket();
-                rp->cl = req->cl;
-                rp->dest = req->dest;
-                rp->id = req->id;
-                rp->network = req->network;
-                rp->size = req->packetSize;
                 rp->source = req->source;
+                rp->dest = req->dest;
+                rp->size = req->packetSize;
+                rp->id = req->id;
+                rp->type = req->type;
+                rp->network = req->network;
+                rp->cl = req->cl;
 
                 /*if (_trace_mode == 1) {
                     //_trace->writeTraceItem(GetSimTime(), rp->source, rp->dest,
@@ -102,7 +109,7 @@ int Interface::Step() {
                 }*/
 
                 EnqueueRequestPacket(rp);
-
+                std::cout << "src: " << rp->source << "\tdst: " << rp->dest << "\tid: " << rp->id << "\ttype: " << rp->type << "\tsize: " << rp->size << "\n---------\n" << std::endl;
                 // acknowledge receipt of packet to FeS2
                 InjectResMsg res;
                 *_channel << res;
@@ -115,25 +122,22 @@ int Interface::Step() {
                 EjectResMsg res;
                 // create packet to store in local queue
                 ReplyPacket* rp = DequeueReplyPacket();
-
-                if (rp != NULL)
-                {
+                if (rp != NULL){
                     res.source = rp->source;
                     res.dest = rp->dest;
+                    res.packetSize = rp->size;
+                    res.msgType = rp->type;
                     res.network = rp->network;
                     res.id = rp->id;
                     res.cl = rp->cl;
-
                     free(rp);
                     rp = NULL;
                 }
-                else
-                {
+                else{
                     res.id = -1;
                 }
 
                 res.remainingRequests = getReplyQueueSize();
-
                 *_channel << res;
 
                 break;
@@ -154,7 +158,6 @@ int Interface::Step() {
                 break;
             }
         }
-
         // done processing message, destroy it
         StreamMessage::destroy(msg);
     }
@@ -218,6 +221,6 @@ ReplyPacket *Interface::DequeueReplyPacket() {
         packet = _reply_buffer.front();
         _reply_buffer.pop();
     }
-
+    //std::cout << "src: " << packet->source << "\tdst: " << packet->dest << "\tid: " << packet->id << std::endl;
     return packet;
 }

@@ -18,6 +18,7 @@ struct RequestPacket {
     int dest;
     int id;
     int size;
+    int type;
     int network;
     int cl;
 };
@@ -26,6 +27,8 @@ struct ReplyPacket {
     int source;
     int dest;
     int id;
+    int size;
+    int type;
     int network;
     int cl;
 };
