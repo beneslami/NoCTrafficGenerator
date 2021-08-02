@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
 #include "globals.h"
@@ -15,11 +16,8 @@
 #define CONNECT 1
 
 static unsigned long long cycle;
-std::map<int, InjectReqMsg> inTransitPackets;
-std::map<int, struct TrafficGenerator::transaction_t> inTransitTransactions;
-int messageId = 0;
+static int messageId;
 SocketStream m_channel;
-PacketQueue packet_queue;
 
 void connect() {
 #if CONNECT
@@ -47,107 +45,115 @@ void exit() {
 #endif
 }
 
-void TrafficGenerator::initiateMessage(int source, int destination, int packetSize, int time, int address) {
-    InjectReqMsg packet;
-    packet.source = source;
-    packet.dest = destination;
-    packet.cl = 0;
-    packet.network = 0;
-    packet.packetSize = packetSize;
-    packet.msgType = 0;
-    packet.address = address;
-    packet_queue.Enqueue(packet, time);
+void TrafficGenerator::initiateMessage(int source, int destination, int packetSize, int time, int type, int id/*for generating response*/) {
+    if(type == READ_REQUEST || type == WRITE_REQUEST){
+        struct InjectReqMsg request;
+        request.source = source;
+        request.dest = destination;
+        request.packetSize = packetSize;
+        request.msgType = type;
+        request.type = INJECT_REQ;
+        request.id = messageId++;
+        Core_queues[source]->Enqueue_request(request, time);
+    }
+    /*else if (type == READ_REPLY || type == WRITE_REPLY){
+        struct InjectResMsg response;
+        response.source = source;
+        response.dest = destination;
+        response.packetSize = packetSize;
+        response.msgType = type;
+        response.type = INJECT_RES;
+        response.id = id;
+        Core_queues[source]->Enqueue_response(response, time);
+    }*/
 }
 
 void TrafficGenerator::Inject() {
-    std::list<InjectReqMsg> packets = packet_queue.DeQueue(cycle);
-    std::list<InjectReqMsg>::iterator it;
-    for(it = packets.begin(); it != packets.end(); ++it) {
-        sendPacket(*it);
+    for(int i = 0; i < numCores; i++){
+        if(Core_queues[i]->request_queue_size() != 0) {
+            std::list<InjectReqMsg> packets = Core_queues[i]->DeQueue_request(cycle);
+            std::list<InjectReqMsg>::iterator it;
+            for (it = packets.begin(); it != packets.end(); ++it) {
+                sendRequestPacket(*it);
+            }
+            Core_queues[i]->cleanUp_request_queue(cycle);
+        }
+        if(Core_queues[i]->response_queue_size() != 0) {
+            std::list<InjectResMsg> packet = Core_queues[i]->DeQueue_response(cycle);
+            std::list<InjectResMsg>::iterator it2;
+            for (it2 = packet.begin(); it2 != packet.end(); ++it2) {
+                sendResponsePacket(*it2);
+            }
+            Core_queues[i]->cleanUp_response_queue(cycle);
+        }
     }
-    packet_queue.cleanUp(cycle);
 }
 
-void TrafficGenerator::sendPacket(InjectReqMsg &req) {
-    req.id = messageId;
-    if((int) req.address == -1) {
-        req.address = messageId;
-        inTransitTransactions[req.address].source = req.source;
-        inTransitTransactions[req.address].dest = req.dest;
-        inTransitTransactions[req.address].acks_received = 0;
-        inTransitTransactions[req.address].data_received = false; //TODO: check to see the type of packet
+void TrafficGenerator::sendRequestPacket(InjectReqMsg &request) {
+    if((int) request.address == -1){
+        request.address = messageId*2 + 1; /* just for fun */
+        inTransitTransactions[request.address].source = request.source;
+        inTransitTransactions[request.address].dest = request.dest;
+        inTransitTransactions[request.address].acks_received = 0;
     }
-    messageId++;
-    inTransitPackets[req.id] = req;
+    inTransitPackets[request.id] = request;
 #if CONNECT
     InjectResMsg res;
-    m_channel << req >> res;
-    if(res.size) {
-        std::cout << "1- src: " << req.source << "\tdst: " << req.dest << "\tid: " << req.id << "\ttype: " << req.type
-                  << "\tsize: " << req.size << "\tcycle: " << cycle << "\tsuccessfully injected to BookSim"
-                  << std::endl;
-    }
+    m_channel << request >> res; /* send the request packet to BookSim*/
 #endif
 }
 
-void react(EjectResMsg ePacket) {
-    std::map<int, InjectReqMsg>::iterator it = inTransitPackets.find(ePacket.id);
-    if(it == inTransitPackets.end()) {
-        std::cerr << "Error: couldn't find in transit packet " << ePacket.id << std::endl;
-        exit(-1);
+void TrafficGenerator::sendResponsePacket(InjectResMsg &response) {
+#if CONNECT
+    InjectResMsg res;
+    m_channel << response >> res; /* send the response packet to BookSim*/
+#endif
+}
+
+TrafficGenerator::TrafficGenerator(int numCore) {
+    _numCore = numCore;
+    for(int i = 0; i < _numCore; i++){
+        PacketQueue *p = new PacketQueue();
+        Core_queues.push_back(p);
     }
+}
 
-    InjectReqMsg request = it->second;
-    std::cout << "2- src: " << request.source << "\tdst: " << request.dest << "\tid: " << request.id << "\ttype: " << request.type
-              << "\tsize: " << request.size << "\tcycle: " << cycle << "\trequest received." << std::endl;
-    InjectReqMsg response;
-    inTransitPackets.erase(it);
-
-    std::map<int, TrafficGenerator::transaction_t>::iterator trans = inTransitTransactions.find(request.address);
-
-    switch(request.msgType) {
-        case READ_REQUEST:
-            std::cout << "Read Request arrived\n";
-            break;
-        case READ_REPLY:
-            std::cout << "Read Reply arrived\n";
-            break;
-        case WRITE_REQUEST:
-            std::cout << "Write Request arrived\n";
-            break;
-        case WRITE_REPLY:
-            std::cout << "Write Reply arrived\n";
-            break;
-        default:
-            std::cout << "unKnown packet arrived\n";
-            break;
-    }
-
-    if(trans->second.Completed()) {
-        inTransitTransactions.erase(trans);
+TrafficGenerator::~TrafficGenerator() {
+    for(int i = 0; i < _numCore; i++){
+        delete[] Core_queues[i];
     }
 }
 
 void TrafficGenerator::Eject() {
 #if CONNECT
-    EjectReqMsg req; //The request to the network
-    EjectResMsg res; //The response from the network
-    bool hasRequests = true; //Whether there are more requests from the network
-
-    //Loop through all the network's messages
+    EjectReqMsg request;
+    EjectResMsg response;
+    bool hasRequests = true;
     while(hasRequests) {
-        m_channel << req >> res;
-        if(res.id >= 0) {
-            //Add responses to list
-            if(res.id > -1) {
-                react(res);
+        m_channel << request >> response;
+        if (response.msgType == READ_REQUEST || response.msgType == WRITE_REQUEST) {
+            struct InjectResMsg response_back;
+            response_back.dest = response.source;
+            response_back.source = response.dest;
+            response_back.packetSize = response.packetSize * 2 /* just for now */;
+            if (response.type == READ_REQUEST)
+                response_back.msgType = READ_REPLY;
+            else if (response.type == WRITE_REQUEST)
+                response_back.msgType = WRITE_REPLY;
+            response_back.type = INJECT_RES;
+            response_back.id = response.id;
+            Core_queues[response_back.source]->Enqueue_response(response_back, cycle);
+        } else if (response.msgType == READ_REPLY || response.msgType == WRITE_REPLY) {
+            std::map<int, InjectReqMsg>::iterator it = inTransitPackets.find(response.id);
+            if (it == inTransitPackets.end()) {
+                std::cerr << "Error: couldn't find in transit packet " << response.id << std::endl;
+                exit(-1);
             }
+            /* Need to check if the packet belongs to current node or not. if yes, then it's done, otherwise, it should re-inject to Booksim */
+            std::cout << "src: " << response.source << "\tdst: " << response.dest << "\tsize: " << response.packetSize
+                      << " is received in cycle: " << cycle << "\n";
         }
-        else{
-            std::cout << res.type << " :No packet from BookSim\n";
-        }
-        //Check if there are more messages from the network
-        hasRequests = res.remainingRequests;
+        hasRequests = response.remainingRequests;
     }
 #endif
 }
@@ -217,7 +223,7 @@ void TrafficGenerator::Run() {
                     while (source == destination) {
                         destination = dst.Generate();
                     }
-                    initiateMessage(source, destination, byteInject, cycle + i + 1, 11111);
+                    initiateMessage(source, destination, byteInject, cycle + i + 1, byteInject%2/* Test */, 0);
                 }
                 i++;
             }
