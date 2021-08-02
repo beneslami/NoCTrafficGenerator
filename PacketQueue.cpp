@@ -11,15 +11,28 @@ PacketQueue::PacketQueue() {
 PacketQueue::~PacketQueue() {
 }
 
-void PacketQueue::Enqueue(InjectReqMsg packet, int time) {
-    queue[time].push_back(packet);
+void PacketQueue::Enqueue_request(InjectReqMsg packet, int time){
+    req_queue[time].push_back(packet);
 }
 
-std::list<InjectReqMsg> PacketQueue::DeQueue(int time) {
-    return queue[time];
+void PacketQueue::Enqueue_response(InjectResMsg packet, int time){
+    resp_queue[time].push_back(packet);
 }
 
-void PacketQueue::cleanUp(int time) {
-    queue[time].clear();
-    queue.erase(queue.find(time));
+std::list<InjectReqMsg> PacketQueue::DeQueue_request(int time) {
+    return req_queue[time];
+}
+
+std::list<InjectResMsg> PacketQueue::DeQueue_response(int time) {
+    return resp_queue[time];
+}
+
+void PacketQueue::cleanUp_request_queue(int time) {
+    req_queue[time].clear();
+    req_queue.erase(req_queue.find(time));
+}
+
+void PacketQueue::cleanUp_response_queue(int time) {
+    resp_queue[time].clear();
+    resp_queue.erase(resp_queue.find(time));
 }
