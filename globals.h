@@ -7,6 +7,7 @@
 
 #include <map>
 #include <iostream>
+#include "netstream/messages.h"
 
 const int READ_REQUEST = 0;
 const int WRITE_REQUEST = 1;
@@ -18,6 +19,8 @@ extern std::map<int, std::map<double, double> > duration;
 extern std::map<int, double>traffic;
 extern std::string destin;
 extern std::vector<float>byteValue;
+extern std::map<int, InjectReqMsg> inTransitPackets;
+extern std::map<int, transaction_t> inTransitTransactions;
 
 extern std::map<int, std::map<float, float> >normal_stat;
 
