@@ -55,7 +55,7 @@ public:
 		memcpy(&addr, in_addr, in_addrlen);
 	}
 
-	int listen(const char *host, int port);
+	int listen(std::string host, int port);
 
 	SocketStream* accept();
 

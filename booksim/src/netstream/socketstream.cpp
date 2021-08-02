@@ -2,8 +2,9 @@
 
 #include <cstdio>
 #include <cerrno>
+#include <string>
 
-int SocketStream::listen(const char *host, int port)
+int SocketStream::listen(std::string host, int port)
 {
 	char *socket_path = "./socket";
 
