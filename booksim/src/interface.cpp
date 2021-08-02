@@ -1,46 +1,32 @@
 //
 // Created by Ben on 7/19/21.
 //
-
 #include "interface.h"
+#include "IntersimConfig.h"
+#include "routefunc.hpp"
+#include "config_utils.hpp"
+#include "TrafficGen.h"
 
 Interface::Interface(const Configuration &config, const vector<Network *> &net) {
     _channel = NULL;
-    _sources = net[0]->NumNodes();
-    _dests   = net[0]->NumNodes();
-
-    _concentrate = true; //config.GetInt("fes2_concentrate") ? true : false;
-    _duplicate_networks = config.GetInt("subnets");
-    _host = "127.0.0.1"; //config.GetStr( "fes2_host");
-    _port = 20211; //config.GetInt("fes2_port");
-    vector<int> mapping; // config.GetIntArray("fes2_mapping");
-    int a[8] = {0,0,1,1,2,2,3,3};
-    for(int i = 0; i < 8 ; i++){
-        mapping.push_back(a[i]);
-    }
+    _icnt_config = new IntersimConfig();
+    _subnets = _icnt_config->GetInt("subnets");
+    _host = _icnt_config->GetStr("_host");
+    _port = _icnt_config->GetInt("_port");
+    vector<int> mapping = _icnt_config->GetIntArray("mapping");
     for(int i = 0; i < mapping.size(); i++) {
         _node_map[i] = mapping[i];
-    }
-
-    _request_buffer = new queue<RequestPacket *> * [_duplicate_networks];
-    for (int i=0; i < _duplicate_networks; i++ ) {
-        _request_buffer[i] = new queue<RequestPacket *> [_sources];
     }
 }
 
 Interface::~Interface() {
-    for ( int n = 0; n < _duplicate_networks; ++n ) {
-        delete [] _request_buffer[n];
-    }
-    delete [] _request_buffer;
+
 }
 
 int Interface::Init() {
-    if (_listenSocket.listen(NS_HOST, NS_PORT) < 0) {
+    if (_listenSocket.listen(_host, _port) < 0) {
         return -1;
     }
-
-    // Wait for Traffic Generator to connect
     _channel = _listenSocket.accept();
 #ifdef NS_DEBUG
     cout << "Traffic Generator instance connected" << endl;
@@ -58,169 +44,190 @@ int Interface::Init() {
 int Interface::Step() {
     bool process_more = true;
     StreamMessage *msg = NULL;
-
-    while (process_more && _channel && _channel->isAlive())
-    {
-        // read message
+    while (process_more && _channel && _channel->isAlive()){
         *_channel >> (StreamMessage*&) msg;
-        std::cout << msg->type << std::endl;
-        switch(msg->type)
-        {
-            case STEP_REQ:
-            {
-                // acknowledge the receipt of step request
-                // we're actually doing a little bit of work in parallel
-                StepResMsg res;
-                *_channel << res;
-                // fall-through and perform one step of BookSim loop
+        switch(msg->type){
+            case STEP_REQ: {
+                StepResMsg step;
+                *_channel << step;
                 process_more = false;
                 break;
             }
-            case INITIALIZE_REQ: {
-                std::cout << "Initiating Booksim and Traffic Generator\n";
-                InitializeResMsg res;
-                *_channel << res;
+            case INJECT_REQ: {
+                InjectReqMsg *req = (InjectReqMsg *) msg;
+                push(req->source, req->dest, (void *) req, req->size, req->msgType);
                 break;
             }
-            case INJECT_REQ:
-            {
-                InjectReqMsg* req = (InjectReqMsg*) msg;
-
-                // create packet to store in local queue
-                RequestPacket* rp = new RequestPacket();
-                rp->source = req->source;
-                rp->dest = req->dest;
-                rp->size = req->packetSize;
-                rp->id = req->id;
-                rp->type = req->type;
-                rp->network = req->network;
-                rp->cl = req->cl;
-
-                /*if (_trace_mode == 1) {
-                    //_trace->writeTraceItem(GetSimTime(), rp->source, rp->dest,
-                    //		rp->size, req->address, rp->network);
-                    stringstream str;
-
-                    str << rp->id << " " << GetSimTime() << " " << rp->source << " "
-                        << rp->dest << " " << rp->size << " " << req->msgType
-                        << " " << req->coType << " " << req->address;
-
-                    _trace->writeTrace(str.str());
-                }*/
-
-                EnqueueRequestPacket(rp);
-                std::cout << "src: " << rp->source << "\tdst: " << rp->dest << "\tid: " << rp->id << "\ttype: " << rp->type << "\tsize: " << rp->size << "\n---------\n" << std::endl;
-                // acknowledge receipt of packet to FeS2
-                InjectResMsg res;
-                *_channel << res;
-
+            case INJECT_RES: {
+                InjectResMsg *resInject = (InjectResMsg *) msg;
+                push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
                 break;
             }
-            case EJECT_REQ:
-            {
-                EjectReqMsg* req = (EjectReqMsg*) msg;
-                EjectResMsg res;
-                // create packet to store in local queue
-                ReplyPacket* rp = DequeueReplyPacket();
-                if (rp != NULL){
-                    res.source = rp->source;
-                    res.dest = rp->dest;
-                    res.packetSize = rp->size;
-                    res.msgType = rp->type;
-                    res.network = rp->network;
-                    res.id = rp->id;
-                    res.cl = rp->cl;
-                    free(rp);
-                    rp = NULL;
-                }
-                else{
-                    res.id = -1;
-                }
-
-                res.remainingRequests = getReplyQueueSize();
-                *_channel << res;
-
+            case EJECT_REQ: {
+                EjectReqMsg *ejReq =(EjectReqMsg *) msg;
+                Flit* f = (Flit*)(pop(ejReq->size));
+                EjectResMsg _res;
+                _res.source = f->src;
+                _res.dest = f->dest;
+                _res.msgType = f->type;
+                _res.id = f->id;
+                _res.network = f->subnetwork;
+                _res.cl = f->cl;
+                *_channel << _res;
                 break;
             }
-            case QUIT_REQ:
-            {
-                QuitResMsg res;
-                *_channel << res;
-
-                return 1; // signal that we're done
-
+            case EJECT_RES: {
                 break;
             }
-            default:
-            {
-                cout << "<Interface::Step> Unknown message type: "
-                     << msg->type << endl;
+            case QUIT_REQ: {
+                QuitResMsg quit;
+                *_channel << quit;
+                return 1;
+                break;
+            }
+            default: {
+                cout << "<Interface::Step> Unknown message type: " << msg->type << endl;
                 break;
             }
         }
-        // done processing message, destroy it
         StreamMessage::destroy(msg);
     }
-
-    return 0;
 }
 
-int Interface::EnqueueRequestPacket(RequestPacket *packet) {
-    _original_destinations[packet->id] = packet->dest;
-
-    //_node_map is based off of the configuration file. See "fes2_mapping"
-    packet->source 	= _node_map[packet->source];
-    packet->dest 	= _node_map[packet->dest];
-
-    // special case: single network
-    if (_duplicate_networks == 1) {
-        _request_buffer[0][packet->source].push(packet);
-    } else {
-        assert (packet->network < _duplicate_networks);
-        _request_buffer[packet->network][packet->source].push(packet);
+void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int packet_type) {
+    assert(HasBuffer(input_deviceID, size));
+    int output_icntID = _node_map[output_deviceID];
+    int input_icntID = _node_map[input_deviceID];
+    unsigned int n_flits = size / _flit_size + ((size % _flit_size)? 1:0);
+    int subnet;
+    if (_subnets == 1) {
+        subnet = 0;
     }
-    return 0;
+    _traffic_manager->_GeneratePacket( input_icntID, n_flits, 0, _traffic_manager->_time, subnet, packet_type, data, output_icntID);
 }
 
-RequestPacket *Interface::DequeueRequestPacket(int source, int network, int cl) {
-    RequestPacket *packet = NULL;
+void* Interface::pop(unsigned deviceID) {
+    int icntID = _node_map[deviceID];
+    void* data = NULL;
+    int subnet = 0;
+    int turn = _round_robin_turn[subnet][icntID];
+    for (int vc = 0; (vc < _vcs) && (data == NULL); vc++) {
+        if (_boundary_buffer[subnet][icntID][turn].HasPacket()) {
+            data = _boundary_buffer[subnet][icntID][turn].PopPacket();
+        }
+        turn++;
+        if (turn == _vcs) turn = 0;
+    }
+    if (data) {
+        _round_robin_turn[subnet][icntID] = turn;
+    }
+    return data;
+}
 
-    if (!_request_buffer[network][source].empty()) {
-        packet = _request_buffer[network][source].front();
-        if (packet->cl == cl) {
-            _request_buffer[network][source].pop();
-        } else {
-            packet = 0;
+void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
+    int vc = flit->vc;
+    assert (_ejection_buffer[subnet][output_icntID][vc].Size() < _ejection_buffer_capacity);
+    _ejection_buffer[subnet][output_icntID][vc].PushFlitData(flit, flit->tail);
+}
+
+void Interface::Transfer2BoundaryBuffer(int subnet, int output){
+    Flit* flit;
+    int vc;
+    for (vc=0; vc<_vcs;vc++) {
+        if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
+            flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
+            assert(flit);
+            _ejection_buffer[subnet][output][vc].PopPacket();
+            _boundary_buffer[subnet][output][vc].PushFlitData( flit->data, flit->tail);
+            _ejected_flit_queue[subnet][output].push(flit); //indicate this flit is already popped from ejection buffer and ready for credit return
+            if ( flit->head ) {
+                assert (flit->dest == output);
+            }
         }
     }
-
-    return packet;
 }
 
-int Interface::EnqueueReplyPacket(ReplyPacket *packet) {
-    assert(_original_destinations.find(packet->id) != _original_destinations.end());
-
-    if (_concentrate) {
-        assert(_original_destinations.find(packet->id) != _original_destinations.end());
-        assert(_original_destinations[packet->id]/2 == packet->dest);
-        packet->source *= 2;
+Flit* Interface::GetEjectedFlit(int subnet, int node){
+    Flit* flit = NULL;
+    if (!_ejected_flit_queue[subnet][node].empty()) {
+        flit = _ejected_flit_queue[subnet][node].front();
+        _ejected_flit_queue[subnet][node].pop();
     }
-
-    packet->dest = _original_destinations[packet->id];
-    _original_destinations.erase(packet->id);
-
-    _reply_buffer.push(packet);
-
-    return 0;
+    return flit;
 }
 
-ReplyPacket *Interface::DequeueReplyPacket() {
-    ReplyPacket *packet = NULL;
-
-    if (!_reply_buffer.empty()) {
-        packet = _reply_buffer.front();
-        _reply_buffer.pop();
+bool Interface::Busy() const {
+    bool busy = !_traffic_manager->_total_in_flight_flits[0].empty();
+    if (!busy) {
+        for (int s = 0; s < _subnets; ++s) {
+            for (unsigned n = 0; n < _n_shader; ++n) {
+                //FIXME: if this cannot make sure _partial_packets is empty
+                assert(_traffic_manager->_input_queue[s][n][0].empty());
+            }
+        }
+    } else {
+        return true;
     }
-    //std::cout << "src: " << packet->source << "\tdst: " << packet->dest << "\tid: " << packet->id << std::endl;
-    return packet;
+    for (int s = 0; s < _subnets; ++s) {
+        for (unsigned n=0; n < _n_shader; ++n) {
+            for (int vc=0; vc<_vcs; ++vc) {
+                if (_boundary_buffer[s][n][vc].HasPacket() ) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
+{
+    bool has_buffer = false;
+    unsigned int n_flits = size / _flit_size + ((size % _flit_size)? 1:0);
+    int icntID = _node_map.find(deviceID)->second;
+    has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
+    if ((_subnets > 1) && deviceID >= _n_shader && deviceID < _n_shader)
+        has_buffer = _traffic_manager->_input_queue[1][icntID][0].size() +n_flits <= _input_buffer_capacity;
+    return has_buffer;
+}
+
+void* Interface::_BoundaryBufferItem::PopPacket()
+{
+    assert (_packet_n);
+    void * data = NULL;
+    void * flit_data = _buffer.front();
+    while (data == NULL) {
+        assert(flit_data == _buffer.front()); //all flits must belong to the same packet
+        if (_tail_flag.front()) {
+            data = _buffer.front();
+            _packet_n--;
+        }
+        _buffer.pop();
+        _tail_flag.pop();
+    }
+    return data;
+}
+
+void* Interface::_BoundaryBufferItem::TopPacket() const
+{
+    assert (_packet_n);
+    void* data = NULL;
+    void* temp_d = _buffer.front();
+    while (data==NULL) {
+        if (_tail_flag.front()) {
+            data = _buffer.front();
+        }
+        assert(temp_d == _buffer.front()); //all flits must belong to the same packet
+    }
+    return data;
+
+}
+
+void Interface::_BoundaryBufferItem::PushFlitData(void* data,bool is_tail)
+{
+    _buffer.push(data);
+    _tail_flag.push(is_tail);
+    if (is_tail) {
+        _packet_n++;
+    }
 }
