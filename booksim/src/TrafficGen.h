@@ -6,6 +6,7 @@
 #define TRAFFICGEN_H
 
 #include <cmath>
+#include <vector>
 #include <sstream>
 #include "flit.hpp"
 #include "stats.hpp"
@@ -21,27 +22,24 @@
 #include "trafficmanager.hpp"
 #include "booksim_config.hpp"
 #include "networks/network.hpp"
+#include "packet_reply_info.hpp"
 
 class TrafficGen : public TrafficManager{
 private:
-    struct PayLoad {
-        int id;
-        int subnetwork;
-    };
+    vector<vector<vector<list<Flit *> > > > _input_queue;
     int  _flit_width;
     int _ideal_interconnect;
-
 protected:
     Interface *_interface;
     virtual void _Step();
-    virtual void _Inject();
-    virtual bool _SingleSim();
     virtual void _RetireFlit( Flit *, int);
-    void _GeneratePacket(int, int, int, int, int, int, int);
 
+    void _GeneratePacket(int, int, int, int, int, int, void* const, int);
 public:
     TrafficGen(const Configuration &, const vector<Network *> &);
     virtual ~TrafficGen();
+    void Init();
+    friend class Interface;
 };
 
 #endif
