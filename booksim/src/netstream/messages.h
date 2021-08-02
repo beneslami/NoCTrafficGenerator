@@ -104,6 +104,14 @@ struct InjectResMsg: StreamMessage
         size = sizeof(InjectResMsg);
         type = INJECT_RES;
     }
+    int source;
+    int dest;
+    int id;
+    int packetSize;
+    int network;
+    int cl;
+    int msgType;
+    unsigned long long address;
 };
 
 struct EjectReqMsg: StreamMessage
