@@ -36,7 +36,17 @@
 #include "booksim_config.hpp"
 
 BookSimConfig::BookSimConfig( )
-{ 
+{
+
+  //===============================
+  //  MCM_GPU options
+  //===============================
+  _int_map["mcm_gpu_concentrate"] = 0;
+  _int_map["flit_width"] = 32;
+  _int_map["ideal_interconnect"] = 0;
+  _int_map["mapping"] = 8;
+  AddStrField("_host", "localhost"); // for connecting FeS2
+  _int_map["_port"] = 20211;
   //========================================================
   // Network options
   //========================================================
