@@ -25,6 +25,14 @@ public:
     int response_queue_size(){
         return resp_queue.size();
     }
+    void Debug_print_request_queue_index(){
+        std::map<int, std::list<InjectReqMsg> >::iterator it;
+        for(it = req_queue.begin(); it != req_queue.end(); ++it){
+            std::cout << it->first << "\t";
+        }
+        std::cout << "\n";
+    }
+
 
 private:
     std::map<int, std::list<InjectReqMsg> > req_queue;
