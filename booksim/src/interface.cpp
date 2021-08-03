@@ -50,17 +50,23 @@ int Interface::Step() {
             case STEP_REQ: {
                 StepResMsg step;
                 *_channel << step;
-                process_more = false;
+                //process_more = false;
                 break;
             }
             case INJECT_REQ: {
                 InjectReqMsg *req = (InjectReqMsg *) msg;
                 push(req->source, req->dest, (void *) req, req->size, req->msgType);
+                InjectResMsg res;
+                res.type = ACKNOWLEDGE;
+                *_channel << res;
                 break;
             }
             case INJECT_RES: {
                 InjectResMsg *resInject = (InjectResMsg *) msg;
                 push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
+                InjectResMsg resAck;
+                resAck.type = ACKNOWLEDGE;
+                *_channel << resAck;
                 break;
             }
             case EJECT_REQ: {
