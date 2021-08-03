@@ -44,9 +44,12 @@ BookSimConfig::BookSimConfig( )
   _int_map["mcm_gpu_concentrate"] = 0;
   _int_map["flit_width"] = 32;
   _int_map["ideal_interconnect"] = 0;
-  _int_map["mapping"] = 8;
+  AddStrField("mapping", "{0, 0, 1, 1, 2, 2, 3, 3}");
   AddStrField("_host", "localhost"); // for connecting FeS2
   _int_map["_port"] = 20211;
+  _int_map["input_buffer_size"] = 122880; // 128/flit_size*INTER_ICNT_CTRL
+  _int_map["ejection_buffer_size"] = 122880;
+  _int_map["boundary_buffer_size"] = 122880;
   //========================================================
   // Network options
   //========================================================
