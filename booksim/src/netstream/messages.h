@@ -15,6 +15,7 @@
 #define EJECT_RES  		7
 #define QUIT_REQ  		8
 #define QUIT_RES  		9
+#define ACKNOWLEDGE     10
 
 struct StreamMessage
 {
