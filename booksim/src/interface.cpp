@@ -28,6 +28,8 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
         _node_map[i] = mapping[i];
     }
     _net = net;
+    _n_shader = 4;
+    this->_CreateBuffer();
     InitializeRoutingMap(*_icnt_config);
 }
 
@@ -52,6 +54,27 @@ int Interface::Init() {
     std::cout << res.type << ": Sending response to Traffic Generator\n";
     std::cout << "==================Initialization Completed==================\n";
     return 0;
+}
+
+void Interface::_CreateBuffer() {
+    unsigned nodes = _n_shader;
+
+    _boundary_buffer.resize(_subnets);
+    _ejection_buffer.resize(_subnets);
+    _round_robin_turn.resize(_subnets);
+    _ejected_flit_queue.resize(_subnets);
+
+    for (int subnet = 0; subnet < _subnets; ++subnet) {
+        _ejection_buffer[subnet].resize(nodes);
+        _boundary_buffer[subnet].resize(nodes);
+        _round_robin_turn[subnet].resize(nodes);
+        _ejected_flit_queue[subnet].resize(nodes);
+
+        for (unsigned node = 0; node < nodes; ++node){
+            _ejection_buffer[subnet][node].resize(_vcs);
+            _boundary_buffer[subnet][node].resize(_vcs);
+        }
+    }
 }
 
 int Interface::Step() {

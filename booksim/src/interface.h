@@ -50,6 +50,7 @@ public:
     Flit *GetEjectedFlit(int, int);
     bool Busy()const;
     bool HasBuffer(unsigned, unsigned int) const;
+    void _CreateBuffer();
 protected:
     static Interface* interface_result;
     class _BoundaryBufferItem {
