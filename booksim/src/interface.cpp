@@ -89,6 +89,7 @@ int Interface::Step() {
             case STEP_REQ: {
                 StepResMsg step;
                 *_channel << step;
+                process_more = false;
                 break;
             }
             case INJECT_REQ: {
@@ -142,7 +143,7 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
     assert(HasBuffer(input_deviceID, size));
     int output_icntID = _node_map[output_deviceID];
     int input_icntID = _node_map[input_deviceID];
-    unsigned int n_flits = size / _flit_size + ((size % _flit_size)? 1:0);
+    unsigned int n_flits = (size / _flit_size) + ((size % _flit_size)? 1:0);
     int subnet;
     if (_subnets == 1) {
         subnet = 0;
@@ -177,7 +178,6 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
-    std::cout << "subnet: " << subnet << "\tout: " << output << std::endl;
     for (vc=0; vc < _vcs; vc++) {
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
@@ -231,7 +231,6 @@ bool Interface::Busy() const {
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
     bool has_buffer = false;
-    std::cout << _flit_size << std::endl;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     int icntID = _node_map.find(deviceID)->second;
     has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
