@@ -11,7 +11,7 @@ std::map<int, double>traffic;
 std::string destin;
 std::vector<float>byteValue;
 std::map<int, InjectReqMsg> inTransitPackets;
-std::map<int, transaction_t> inTransitTransactions;
+std::map<int, RequestPacket> inTransitTransactions;
 
 std::vector<int>window_num;
 std::map<int, std::map<float, float> >normal_stat;
