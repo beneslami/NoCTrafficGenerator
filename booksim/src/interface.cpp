@@ -21,6 +21,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _channel = NULL;
     _icnt_config = new IntersimConfig();
     _subnets = _icnt_config->GetInt("subnets");
+    _vcs = config.GetInt("num_vcs");
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
     vector<int> mapping = _icnt_config->GetIntArray("mapping");
@@ -174,7 +175,6 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
-    std::cout << _vcs << std::endl;
     for (vc=0; vc < _vcs; vc++) {
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
@@ -192,7 +192,7 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
 
 Flit* Interface::GetEjectedFlit(int subnet, int node){
     Flit* flit = NULL;
-    assert(_ejected_flit_queue[subnet][node].empty() == 0);
+    assert(_ejected_flit_queue[subnet][node].empty() != 0);
     if (!_ejected_flit_queue[subnet][node].empty()) {
         std::cout << "I'm inside\n";
         flit = _ejected_flit_queue[subnet][node].front();
