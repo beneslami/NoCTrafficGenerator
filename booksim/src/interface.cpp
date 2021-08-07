@@ -190,7 +190,9 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
 
 Flit* Interface::GetEjectedFlit(int subnet, int node){
     Flit* flit = NULL;
+    std::cout << "I'm here\n";
     if (!_ejected_flit_queue[subnet][node].empty()) {
+        std::cout << "I'm inside\n";
         flit = _ejected_flit_queue[subnet][node].front();
         _ejected_flit_queue[subnet][node].pop();
     }
