@@ -39,6 +39,7 @@ struct ReplyPacket {
 class Interface {
 public:
     Interface(const Configuration &, const vector<Network *> & net);
+    static Interface* get_instance(Configuration const & , vector<Network *> const & );
     ~Interface();
     void push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int type);
     void *pop(unsigned);
@@ -50,6 +51,7 @@ public:
     bool Busy()const;
     bool HasBuffer(unsigned, unsigned int) const;
 protected:
+    static Interface* interface_result;
     class _BoundaryBufferItem {
     public:
         _BoundaryBufferItem():_packet_n(0) {}

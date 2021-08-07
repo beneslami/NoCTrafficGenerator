@@ -6,7 +6,16 @@
 #include "routefunc.hpp"
 #include "config_utils.hpp"
 #include "TrafficGen.h"
+#include "globals.hpp"
 
+Interface* Interface::interface_result = nullptr;
+Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
+    if(interface_result == nullptr){
+        interface_result = new Interface(config, net);
+        return interface_result;
+    }
+    return interface_result;
+}
 Interface::Interface(const Configuration &config, const vector<Network *> &net) {
     _channel = NULL;
     _icnt_config = new IntersimConfig();
@@ -17,6 +26,8 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     for(int i = 0; i < mapping.size(); i++) {
         _node_map[i] = mapping[i];
     }
+    _net = net;
+    InitializeRoutingMap(*_icnt_config);
 }
 
 Interface::~Interface() {
@@ -27,6 +38,7 @@ int Interface::Init() {
     if (_listenSocket.listen(_host, _port) < 0) {
         return -1;
     }
+    std::cout << "listening on port " << _port << std::endl;
     _channel = _listenSocket.accept();
 #ifdef NS_DEBUG
     cout << "Traffic Generator instance connected" << endl;
@@ -50,7 +62,6 @@ int Interface::Step() {
             case STEP_REQ: {
                 StepResMsg step;
                 *_channel << step;
-                //process_more = false;
                 break;
             }
             case INJECT_REQ: {
