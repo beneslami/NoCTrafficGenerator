@@ -175,7 +175,7 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
-    std::cout << _vcs << std::endl;
+    std::cout << "subnet: " << subnet << "\tout: " << output << std::endl;
     for (vc=0; vc < _vcs; vc++) {
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
