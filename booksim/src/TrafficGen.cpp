@@ -50,6 +50,7 @@ void TrafficGen::_Step() {
                 _interface->WriteOutBuffer(subnet, n, f);
             }
             _interface->Transfer2BoundaryBuffer(subnet, n);
+            std::cout << "I'm here: " << subnet << "\t" << n << "\n";
             Flit *const ejected_flit = _interface->GetEjectedFlit(subnet, n);
             if (ejected_flit) {
                 if (ejected_flit->head)
