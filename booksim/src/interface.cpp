@@ -29,7 +29,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     }
     _net = net;
     _n_shader = 4;
-    this->_CreateBuffer();
+    _CreateBuffer();
     InitializeRoutingMap(*_icnt_config);
 }
 
@@ -75,7 +75,6 @@ void Interface::_CreateBuffer() {
             _boundary_buffer[subnet][node].resize(_vcs);
         }
     }
-    std::cout << "ejected_flit_queue[" << _subnets << "][" << nodes << "]\n";
 }
 
 int Interface::Step() {
@@ -178,6 +177,7 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     for (vc=0; vc<_vcs;vc++) {
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
+            std::cout << "src: " <<  flit->src << "\tdst: " << flit->dest << "\tid: " << flit->id << std::endl;
             assert(flit);
             _ejection_buffer[subnet][output][vc].PopPacket();
             _boundary_buffer[subnet][output][vc].PushFlitData( flit->data, flit->tail);
