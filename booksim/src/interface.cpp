@@ -7,8 +7,9 @@
 #include "config_utils.hpp"
 #include "TrafficGen.h"
 #include "globals.hpp"
+#include <stddef.h>
 
-Interface* Interface::interface_result = nullptr;
+Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
     if(interface_result == nullptr){
         interface_result = new Interface(config, net);
