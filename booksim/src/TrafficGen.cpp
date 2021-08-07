@@ -91,54 +91,6 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     }
     _write_reply_size.resize(_classes, _write_reply_size.back());
 
-    string packet_size_str = config.GetStr("packet_size");
-    if(packet_size_str.empty()) {
-        _packet_size.push_back(vector<int>(1, config.GetInt("packet_size")));
-    } else {
-        vector<string> packet_size_strings = tokenize_str(packet_size_str);
-        for(size_t i = 0; i < packet_size_strings.size(); ++i) {
-            _packet_size.push_back(tokenize_int(packet_size_strings[i]));
-        }
-    }
-    _packet_size.resize(_classes, _packet_size.back());
-
-    string packet_size_rate_str = config.GetStr("packet_size_rate");
-    if(packet_size_rate_str.empty()) {
-        int rate = config.GetInt("packet_size_rate");
-        assert(rate >= 0);
-        for(int c = 0; c < _classes; ++c) {
-            int size = _packet_size[c].size();
-            _packet_size_rate.push_back(vector<int>(size, rate));
-            _packet_size_max_val.push_back(size * rate - 1);
-        }
-    } else {
-        vector<string> packet_size_rate_strings = tokenize_str(packet_size_rate_str);
-        packet_size_rate_strings.resize(_classes, packet_size_rate_strings.back());
-        for(int c = 0; c < _classes; ++c) {
-            vector<int> rates = tokenize_int(packet_size_rate_strings[c]);
-            rates.resize(_packet_size[c].size(), rates.back());
-            _packet_size_rate.push_back(rates);
-            int size = rates.size();
-            int max_val = -1;
-            for(int i = 0; i < size; ++i) {
-                int rate = rates[i];
-                assert(rate >= 0);
-                max_val += rate;
-            }
-            _packet_size_max_val.push_back(max_val);
-        }
-    }
-
-    for(int c = 0; c < _classes; ++c) {
-        if(_use_read_write[c]) {
-            _packet_size[c] =
-                    vector<int>(1, (_read_request_size[c] + _read_reply_size[c] +
-                                    _write_request_size[c] + _write_reply_size[c]) / 2);
-            _packet_size_rate[c] = vector<int>(1, 1);
-            _packet_size_max_val[c] = 0;
-        }
-    }
-
     _load = config.GetFloatArray("injection_rate");
     if(_load.empty()) {
         _load.push_back(config.GetFloat("injection_rate"));
