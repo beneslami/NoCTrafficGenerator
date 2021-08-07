@@ -29,7 +29,6 @@ void destinationModel(std::ifstream& modelFile){
              * distribution here.*/
         }
     }
-
 }
 
 void byteModel(std::ifstream& modelFile){
@@ -76,6 +75,7 @@ void durationModel(std::ifstream& modelFile, std::string header, double bt){
     temporaryList.clear();
     head.clear();
     tail.clear();
+
 }
 
 void readModel(std::ifstream& modelFile){
