@@ -96,7 +96,7 @@ void TrafficGenerator::sendRequestPacket(InjectReqMsg &request) {
         request.address = messageId*2 + 1; /* just for fun */
         inTransitTransactions[request.address].source = request.source;
         inTransitTransactions[request.address].dest = request.dest;
-        inTransitTransactions[request.address].acks_received = 0;
+        //inTransitTransactions[request.address].acks_received = 0;
     }
     inTransitPackets[request.id] = request;
 #if CONNECT
@@ -199,6 +199,7 @@ void TrafficGenerator::Run() {
     }
     else{
         //Connect to network simulator
+
         connect();
         RandomGenerator::UniformDistribution dst;
         RandomGenerator::UniformDistribution src;
