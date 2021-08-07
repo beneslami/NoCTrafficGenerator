@@ -38,24 +38,27 @@
 #include "batchtrafficmanager.hpp"
 #include "random_utils.hpp" 
 #include "vc.hpp"
+#include "globals.hpp"
 #include "packet_reply_info.hpp"
 #include "TrafficGen.h"
+#include "interface.h"
 
-
-TrafficManager * TrafficManager::New(Configuration const & config,
-                                     vector<Network *> const & net)
+Interface *_interface_ = NULL;
+TrafficManager * TrafficManager::New(Configuration const & config, vector<Network *> const & net)
 {
-    TrafficManager * result = NULL;
+    TrafficManager* result = NULL;
     string sim_type = config.GetStr("sim_type");
-    if((sim_type == "latency") || (sim_type == "throughput")) {
+    if ((sim_type == "latency") || (sim_type == "throughput")) {
         result = new TrafficManager(config, net);
-    } else if(sim_type == "batch") {
+    } else if (sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
-    } else if(sim_type == "mcm_gpu")
+    } else if (sim_type == "mcm_gpu") {
         result = new TrafficGen(config, net);
-    else {
+        _interface_ = Interface::get_instance(config, net);
+    }
+    else
         cerr << "Unknown simulation type: " << sim_type << endl;
-    } 
+    std::cout << sim_type << std::endl;
     return result;
 }
 
@@ -582,12 +585,8 @@ TrafficManager::TrafficManager( const Configuration &config, const vector<Networ
             }
         }
     }
-
     _slowest_flit.resize(_classes, -1);
     _slowest_packet.resize(_classes, -1);
-
- 
-
 }
 
 TrafficManager::~TrafficManager( )
@@ -642,7 +641,6 @@ TrafficManager::~TrafficManager( )
     Flit::FreeAll();
     Credit::FreeAll();
 }
-
 
 void TrafficManager::_RetireFlit( Flit *f, int dest )
 {
@@ -786,8 +784,7 @@ int TrafficManager::_IssuePacket( int source, int cl )
     return result;
 }
 
-void TrafficManager::_GeneratePacket( int source, int stype, 
-                                      int cl, int time )
+void TrafficManager::_GeneratePacket( int source, int stype, int cl, int time )
 {
     assert(stype!=0);
 
@@ -867,7 +864,7 @@ void TrafficManager::_GeneratePacket( int source, int stype,
         f->ctime  = time;
         f->record = record;
         f->cl     = cl;
-
+        f->type = Flit::READ_REQUEST;
         _total_in_flight_flits[f->cl].insert(make_pair(f->id, f));
         if(record) {
             _measured_in_flight_flits[f->cl].insert(make_pair(f->id, f));
@@ -876,7 +873,7 @@ void TrafficManager::_GeneratePacket( int source, int stype,
         if(gTrace){
             cout<<"New Flit "<<f->src<<endl;
         }
-        f->type = packet_type;
+
 
         if ( i == 0 ) { // Head flit
             f->head = true;
@@ -972,13 +969,29 @@ void TrafficManager::_Step( )
         for ( int n = 0; n < _nodes; ++n ) {
             Flit * const f = _net[subnet]->ReadFlit( n );
             if ( f ) {
-                if(f->watch) {
+                if (f->watch) {
                     *gWatchOut << GetSimTime() << " | "
                                << "node" << n << " | "
                                << "Ejecting flit " << f->id
                                << " (packet " << f->pid << ")"
                                << " from VC " << f->vc
                                << "." << endl;
+                }
+                _interface_->WriteOutBuffer(subnet, n, f);  //Added by Me
+            }
+            _interface_->Transfer2BoundaryBuffer(subnet, n);   // Added by me: Start
+            Flit *const ejected_flit = _interface_->GetEjectedFlit(subnet, n);
+            std::cout << _sample_period << std::endl;
+            if (ejected_flit) {
+                if (ejected_flit->head)
+                    assert(ejected_flit->dest == n);
+                if (ejected_flit->watch) {
+                    *gWatchOut << GetSimTime() << " | "
+                               << "node" << n << " | "
+                               << "Ejected flit " << ejected_flit->id
+                               << " (packet " << ejected_flit->pid
+                               << " VC " << ejected_flit->vc << ")"
+                               << "from ejection buffer." << endl;
                 }
                 flits[subnet].insert(make_pair(n, f));
                 if((_sim_state == warming_up) || (_sim_state == running)) {
@@ -987,7 +1000,7 @@ void TrafficManager::_Step( )
                         ++_accepted_packets[f->cl][n];
                     }
                 }
-            }
+            }                                                   // Added by me: end
 
             Credit * const c = _net[subnet]->ReadCredit( n );
             if ( c ) {
@@ -1005,7 +1018,7 @@ void TrafficManager::_Step( )
                 c->Free();
             }
         }
-        _net[subnet]->ReadInputs( );
+        _net[subnet]->ReadInputs();
     }
   
     if ( !_empty_network ) {
@@ -1013,54 +1026,37 @@ void TrafficManager::_Step( )
     }
 
     for(int subnet = 0; subnet < _subnets; ++subnet) {
-
         for(int n = 0; n < _nodes; ++n) {
-
             Flit * f = NULL;
-
             BufferState * const dest_buf = _buf_states[n][subnet];
-
             int const last_class = _last_class[n][subnet];
-
             int class_limit = _classes;
-
             if(_hold_switch_for_packet) {
                 list<Flit *> const & pp = _partial_packets[n][last_class];
                 if(!pp.empty() && !pp.front()->head && 
                    !dest_buf->IsFullFor(pp.front()->vc)) {
                     f = pp.front();
                     assert(f->vc == _last_vc[n][subnet][last_class]);
-
-                    // if we're holding the connection, we don't need to check that class 
-                    // again in the for loop
                     --class_limit;
                 }
             }
 
             for(int i = 1; i <= class_limit; ++i) {
-
                 int const c = (last_class + i) % _classes;
-
                 list<Flit *> const & pp = _partial_packets[n][c];
-
                 if(pp.empty()) {
                     continue;
                 }
-
                 Flit * const cf = pp.front();
                 assert(cf);
                 assert(cf->cl == c);
-	
                 if(cf->subnetwork != subnet) {
                     continue;
                 }
-
                 if(f && (f->pri >= cf->pri)) {
                     continue;
                 }
-
                 if(cf->head && cf->vc == -1) { // Find first available VC
-	  
                     OutputSet route_set;
                     _rf(NULL, cf, -1, &route_set, true);
                     set<OutputSet::sSetElement> const & os = route_set.GetSet();
@@ -1156,13 +1152,9 @@ void TrafficManager::_Step( )
             }
 
             if(f) {
-
                 assert(f->subnetwork == subnet);
-
                 int const c = f->cl;
-
                 if(f->head) {
-	  
                     if (_lookahead_routing) {
                         if(!_noq) {
                             const FlitChannel * inject = _net[subnet]->GetInject(n);
@@ -1185,27 +1177,21 @@ void TrafficManager::_Step( )
                     } else {
                         f->la_route_set.Clear();
                     }
-
                     dest_buf->TakeBuffer(f->vc);
                     _last_vc[n][subnet][c] = f->vc;
                 }
-	
                 _last_class[n][subnet] = c;
-
                 _partial_packets[n][c].pop_front();
 
 #ifdef TRACK_FLOWS
                 ++_outstanding_credits[c][subnet][n];
                 _outstanding_classes[n][subnet][f->vc].push(c);
 #endif
-
                 dest_buf->SendingFlit(f);
-	
                 if(_pri_type == network_age_based) {
                     f->pri = numeric_limits<int>::max() - _time;
                     assert(f->pri >= 0);
                 }
-	
                 if(f->watch) {
                     *gWatchOut << GetSimTime() << " | "
                                << "node" << n << " | "
@@ -1216,13 +1202,11 @@ void TrafficManager::_Step( )
                                << "." << endl;
                 }
                 f->itime = _time;
-
                 // Pass VC "back"
                 if(!_partial_packets[n][c].empty() && !f->tail) {
                     Flit * const nf = _partial_packets[n][c].front();
                     nf->vc = f->vc;
                 }
-	
                 if((_sim_state == warming_up) || (_sim_state == running)) {
                     ++_sent_flits[c][n];
                     if(f->head) {
@@ -1233,9 +1217,7 @@ void TrafficManager::_Step( )
 #ifdef TRACK_FLOWS
                 ++_injected_flits[c][n];
 #endif
-	
                 _net[subnet]->WriteFlit(f, n);
-	
             }
         }
     }
@@ -1261,13 +1243,12 @@ void TrafficManager::_Step( )
 #ifdef TRACK_FLOWS
                 ++_ejected_flits[f->cl][n];
 #endif
-	
                 _RetireFlit(f, n);
             }
         }
         flits[subnet].clear();
-        _net[subnet]->Evaluate( );
-        _net[subnet]->WriteOutputs( );
+        _net[subnet]->Evaluate();
+        _net[subnet]->WriteOutputs();
     }
 
     ++_time;
@@ -1275,7 +1256,6 @@ void TrafficManager::_Step( )
     if(gTrace){
         cout<<"TIME "<<_time<<endl;
     }
-
 }
   
 bool TrafficManager::_PacketsOutstanding( ) const
@@ -1435,15 +1415,15 @@ bool TrafficManager::_SingleSim( )
             clear_last = false;
             _ClearStats( );
         }
-    
-    
+
+
         for ( int iter = 0; iter < _sample_period; ++iter )
-            _Step( );
-    
+            _Step();
+
         //cout << _sim_state << endl;
 
         UpdateStats();
-        DisplayStats();
+        //DisplayStats();
     
         int lat_exc_class = -1;
         int lat_chg_exc_class = -1;
@@ -1615,7 +1595,6 @@ bool TrafficManager::_SingleSim( )
 bool TrafficManager::Run( )
 {
     for ( int sim = 0; sim < _total_sims; ++sim ) {
-
         _time = 0;
 
         //remove any pending request from the previous simulations
@@ -1639,14 +1618,14 @@ bool TrafficManager::Run( )
         // draing, wait until all packets finish
         _sim_state    = warming_up;
   
-        _ClearStats( );
+        _ClearStats();
 
         for(int c = 0; c < _classes; ++c) {
             _traffic_pattern[c]->reset();
             _injection_process[c]->reset();
         }
 
-        if ( !_SingleSim( ) ) {
+        if ( !_SingleSim() ) {
             cout << "Simulation unstable, ending ..." << endl;
             return false;
         }
@@ -1662,12 +1641,11 @@ bool TrafficManager::Run( )
         }
 
         while( packets_left ) { 
-            _Step( ); 
-
+            _Step();
             ++empty_steps;
 
             if ( empty_steps % 1000 == 0 ) {
-                _DisplayRemaining( ); 
+                //_DisplayRemaining( );
             }
       
             packets_left = false;
@@ -1691,9 +1669,9 @@ bool TrafficManager::Run( )
         _UpdateOverallStats();
     }
   
-    DisplayOverallStats();
+    //DisplayOverallStats();
     if(_print_csv_results) {
-        DisplayOverallStatsCSV();
+        //DisplayOverallStatsCSV();
     }
   
     return true;
