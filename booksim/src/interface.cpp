@@ -17,6 +17,7 @@ Interface* Interface::get_instance(Configuration const & config, vector<Network 
     }
     return interface_result;
 }
+
 Interface::Interface(const Configuration &config, const vector<Network *> &net) {
     _channel = NULL;
     _icnt_config = new IntersimConfig();
@@ -229,7 +230,7 @@ bool Interface::Busy() const {
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
     bool has_buffer = false;
-    std::cout << _flit_size << std::endl;
+    std::cout << _flit_width << std::endl;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     int icntID = _node_map.find(deviceID)->second;
     has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
