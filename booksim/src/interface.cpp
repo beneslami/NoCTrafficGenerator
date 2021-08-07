@@ -75,6 +75,7 @@ void Interface::_CreateBuffer() {
             _boundary_buffer[subnet][node].resize(_vcs);
         }
     }
+    std::cout << "ejected_flit_queue[" << _subnets << "][" << nodes << "]\n";
 }
 
 int Interface::Step() {
