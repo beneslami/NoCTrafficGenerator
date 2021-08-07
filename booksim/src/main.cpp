@@ -41,7 +41,7 @@
 #include <iostream>
 #include <fstream>
 
-
+#include "interface.h"
 
 #include <sstream>
 #include "booksim.hpp"
@@ -62,6 +62,7 @@
 
  /* the current traffic manager instance */
 TrafficManager * trafficManager = NULL;
+Interface *_interface = NULL;
 
 int GetSimTime() {
   return trafficManager->getTime();
@@ -178,7 +179,7 @@ int main( int argc, char **argv )
   } else {
     gWatchOut = new ofstream(watch_out_file.c_str());
   }
-  
+
 
   /*configure and run the simulator
    */

@@ -7,7 +7,6 @@
 #include <string>
 #include <chrono>
 #include "TrafficGenerator.h"
-#include "RandomGenerator.h"
 #include "ReadFile.h"
 #include "globals.h"
 
@@ -16,7 +15,6 @@ int main(int argc, char **argv){
         std::cerr << "Need 3 parameters: [MODEL FILE] [DURATION IN CYCLE] [NUMBER OF CORE]" << std::endl;
         return -1;
     }
-
     std::ifstream modelFile(argv[1]);
     if(!modelFile.good()) {
         std::cerr << "Could not open file " << argv[1] << std::endl;
@@ -25,6 +23,7 @@ int main(int argc, char **argv){
     numCycles = std::stoull(argv[2]);
     numCores = std::stoi(argv[3]);
     readModel(modelFile);
+    std::cout << "1 \n ";
     TrafficGenerator TGen = TrafficGenerator(numCores);
     auto start = std::chrono::high_resolution_clock::now();
     TGen.Run();
