@@ -6,11 +6,10 @@
 
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
     _flit_width = config.GetInt( "flit_width" );
-    //If 1, packets are returned to FeS2 without being routed through booksim
     _ideal_interconnect = config.GetInt( "ideal_interconnect" );
-    _interface = new Interface(config, net);
+    _interface = Interface::get_instance(config, net);
     _interface->Init();
-    _total_sims = 0;
+    _total_sims = config.GetInt( "sim_count" );
     _input_queue.resize(_subnets);
     for ( int subnet = 0; subnet < _subnets; ++subnet) {
         _input_queue[subnet].resize(_nodes);
@@ -18,6 +17,8 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
             _input_queue[subnet][node].resize(_classes);
         }
     }
+    _time = 0;
+    _sim_state = running;
 }
 
 TrafficGen::~TrafficGen(){
@@ -314,7 +315,7 @@ void TrafficGen::_Step() {
         _net[subnet]->Evaluate();
         _net[subnet]->WriteOutputs();
     }
-
+    _interface->Step();
     ++_time;
     assert(_time);
     if(gTrace){
