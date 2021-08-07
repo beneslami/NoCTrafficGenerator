@@ -54,6 +54,7 @@ int Interface::Init() {
     std::cout << req.type <<  ":Receiving initiation packet from Traffic Generator\n";
     std::cout << res.type << ": Sending response to Traffic Generator\n";
     std::cout << "==================Initialization Completed==================\n";
+    std::cout << _subnets << std::endl;
     return 0;
 }
 
