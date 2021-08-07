@@ -58,7 +58,7 @@ BookSimConfig::BookSimConfig( )
   AddStrField( "channel_file", "" ) ;
 
   // Physical sub-networks
-  _int_map["subnets"] = 1;
+  _int_map["subnets"] = 2;
 
   //==== Topology options =======================
   AddStrField( "topology", "torus" );
