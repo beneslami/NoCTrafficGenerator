@@ -3,6 +3,7 @@
 //
 
 #include "TrafficGen.h"
+#include "random_utils.hpp"
 
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
     _nodes = _net[0]->NumNodes();
