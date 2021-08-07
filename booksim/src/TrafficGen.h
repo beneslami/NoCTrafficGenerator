@@ -6,6 +6,7 @@
 #define TRAFFICGEN_H
 
 #include <cmath>
+#include <limits>
 #include <vector>
 #include <sstream>
 #include "flit.hpp"
