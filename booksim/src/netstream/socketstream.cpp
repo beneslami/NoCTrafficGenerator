@@ -6,10 +6,10 @@
 
 int SocketStream::listen(std::string host, int port)
 {
-	char *socket_path = "./socket";
+    char *socket_path = "./socket";
 
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
@@ -19,41 +19,41 @@ int SocketStream::listen(std::string host, int port)
         return -1;
     }
 
-	// Bind it to the listening port
-	unlink(socket_path);
-	if (::bind(so, (struct sockaddr*)&addr, sizeof(addr)) != false) {
-		 cout << "Error binding socket." << endl;
-		 return -1;
-	}
-	// Listen for connections
-	if (::listen(so, NS_MAX_PENDING) != 0) {
-		 cout << "Error listening on socket." << endl;
-		 return -1;
-	}
-	bIsAlive = true;
+    // Bind it to the listening port
+    unlink(socket_path);
+    if (::bind(so, (struct sockaddr*)&addr, sizeof(addr)) != false) {
+        cout << "Error binding socket." << endl;
+        return -1;
+    }
+    // Listen for connections
+    if (::listen(so, NS_MAX_PENDING) != 0) {
+        cout << "Error listening on socket." << endl;
+        return -1;
+    }
+    bIsAlive = true;
 
 #ifdef NS_DEBUG
-	cout << "Listening on socket" << endl;
+    cout << "Listening on socket" << endl;
 #endif
 
-	return 0;
+    return 0;
 }
 
 // accept a new connection
 SocketStream* SocketStream::accept()
 {
-	struct sockaddr_in clientaddr;
-	socklen_t clientaddrlen = sizeof clientaddr;
-	int clientsock = ::accept(so, (struct sockaddr*)&clientaddr, &clientaddrlen);
-	if ( clientsock < 0 ){
-    	cout << "Error accepting a connection";
-    	return NULL;
-	}
-	// prevent small packets from getting stuck in OS queues
-	//int on = 1;
-	//setsockopt (so, SOL_TCP, TCP_NODELAY, &on, sizeof (on));
+    struct sockaddr_in clientaddr;
+    socklen_t clientaddrlen = sizeof clientaddr;
+    int clientsock = ::accept(so, (struct sockaddr*)&clientaddr, &clientaddrlen);
+    if ( clientsock < 0 ){
+        cout << "Error accepting a connection";
+        return NULL;
+    }
+    // prevent small packets from getting stuck in OS queues
+    //int on = 1;
+    //setsockopt (so, SOL_TCP, TCP_NODELAY, &on, sizeof (on));
 
-	return new SocketStream(clientsock, (struct sockaddr*)&clientaddr, clientaddrlen);
+    return new SocketStream(clientsock, (struct sockaddr*)&clientaddr, clientaddrlen);
 }
 
 

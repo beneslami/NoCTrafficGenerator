@@ -25,39 +25,39 @@ using namespace std;
 class SocketStream
 {
 public:
-	int so; // the socket
-	struct sockaddr_in addr;
-	bool bIsAlive;
+    int so; // the socket
+    struct sockaddr_in addr;
+    bool bIsAlive;
 
 public:
 
-	SocketStream() : so(-1), bIsAlive(false)
-	{
-	}
+    SocketStream() : so(-1), bIsAlive(false)
+    {
+    }
 
-	// create from an existing socket
-	SocketStream(int sock) : so(sock), bIsAlive(true)
-	{
-	}
+    // create from an existing socket
+    SocketStream(int sock) : so(sock), bIsAlive(true)
+    {
+    }
 
-	~SocketStream()
-	{
-		if (so != -1)
-		{
-			close(so);
-		}
-	}
+    ~SocketStream()
+    {
+        if (so != -1)
+        {
+            close(so);
+        }
+    }
 
-	SocketStream(int sock, struct sockaddr *in_addr, socklen_t in_addrlen)
-	{
-		so = sock;
-		bIsAlive = true;
-		memcpy(&addr, in_addr, in_addrlen);
-	}
+    SocketStream(int sock, struct sockaddr *in_addr, socklen_t in_addrlen)
+    {
+        so = sock;
+        bIsAlive = true;
+        memcpy(&addr, in_addr, in_addrlen);
+    }
 
-	int listen(std::string host, int port);
+    int listen(std::string host, int port);
 
-	SocketStream* accept();
+    SocketStream* accept();
 
     // read from the socket
     int get(void *data, int number);
@@ -65,10 +65,10 @@ public:
     // write to socket
     int put(const void *data, int number);
 
-	bool isAlive()
-	{
-		return bIsAlive;
-	}
+    bool isAlive()
+    {
+        return bIsAlive;
+    }
 
 };
 

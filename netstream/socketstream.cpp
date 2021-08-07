@@ -5,35 +5,35 @@
 
 int SocketStream::connect(const char *host, int port)
 {
-	char *socket_path = "./socket";
-	// Create a socket.
-	if ( (so = socket(AF_INET, SOCK_STREAM, 0)) < 0 ){
-		std::cout << "Error creating socket." << std::endl;
-		return -1;
-	}
-	std::memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr(NS_HOST);
-	addr.sin_port = htons(NS_PORT);
+    char *socket_path = "./socket";
+    // Create a socket.
+    if ( (so = socket(AF_INET, SOCK_STREAM, 0)) < 0 ){
+        std::cout << "Error creating socket." << std::endl;
+        return -1;
+    }
+    std::memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(NS_HOST);
+    addr.sin_port = htons(NS_PORT);
 
     // Connect to the server.
-	if (::connect(so, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
-	    perror("connect");
-    	std::cout << "Connection failed." << std::endl;
+    if (::connect(so, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
+        perror("connect");
+        std::cout << "Connection failed." << std::endl;
         return -1;
-	}
+    }
 
     // prevent small packets from getting stuck in OS queues
     //int on = 1;
     //setsockopt (so, SOL_TCP, TCP_NODELAY, &on, sizeof (on));
 
-	bIsAlive = true;
+    bIsAlive = true;
 
 #ifdef NS_DEBUG
     std::cout << "Connected to host" << std::endl;
 #endif
 
-	return 0;
+    return 0;
 }
 
 // read from the socket
