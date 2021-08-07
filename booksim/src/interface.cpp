@@ -11,7 +11,7 @@
 
 Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
-    if(interface_result == nullptr){
+    if(interface_result == NULL){
         interface_result = new Interface(config, net);
         return interface_result;
     }
