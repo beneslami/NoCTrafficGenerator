@@ -5,6 +5,7 @@
 #include "TrafficGen.h"
 
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
+    _vcs = config.GetInt("num_vcs");
     _flit_width = config.GetInt( "flit_width" );
     _ideal_interconnect = config.GetInt( "ideal_interconnect" );
     _interface = Interface::get_instance(config, net);
