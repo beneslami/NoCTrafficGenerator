@@ -268,7 +268,7 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     } else if(stats_out_file == "-") {
         _stats_out = &cout;
     } else {
-        _stats_out = new ofstream(stats_out_file.c_str());
+        _stats_out = new std::ofstream(stats_out_file.c_str());
         config.WriteMatlabFile(_stats_out);
     }
 

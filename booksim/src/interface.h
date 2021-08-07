@@ -7,6 +7,7 @@
 
 #include <map>
 #include <queue>
+#include <fstream>
 #include "module.hpp"
 #include "config_utils.hpp"
 #include "netstream/messages.h"
