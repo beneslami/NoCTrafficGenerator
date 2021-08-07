@@ -54,7 +54,6 @@ int Interface::Init() {
     std::cout << req.type <<  ":Receiving initiation packet from Traffic Generator\n";
     std::cout << res.type << ": Sending response to Traffic Generator\n";
     std::cout << "==================Initialization Completed==================\n";
-    std::cout << _subnets << std::endl;
     return 0;
 }
 
@@ -230,7 +229,8 @@ bool Interface::Busy() const {
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
     bool has_buffer = false;
-    unsigned int n_flits = size / _flit_size + ((size % _flit_size)? 1:0);
+    std::cout << _flit_size << std::endl;
+    unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     int icntID = _node_map.find(deviceID)->second;
     has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
     if ((_subnets > 1) && deviceID >= _n_shader && deviceID < _n_shader)
