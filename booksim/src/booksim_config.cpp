@@ -45,7 +45,7 @@ BookSimConfig::BookSimConfig( )
   _int_map["flit_width"] = 32;
   _int_map["ideal_interconnect"] = 0;
   AddStrField("mapping", "{0, 0, 1, 1, 2, 2, 3, 3}");
-  AddStrField("_host", "localhost"); // for connecting FeS2
+  AddStrField("_host", "127.0.0.1"); // for connecting FeS2
   _int_map["_port"] = 20211;
   _int_map["input_buffer_size"] = 122880; // 128/flit_size*INTER_ICNT_CTRL
   _int_map["ejection_buffer_size"] = 122880;
@@ -239,7 +239,7 @@ BookSimConfig::BookSimConfig( )
   //   latency    - average + latency distribution for a particular injection rate
   //   throughput - sustained throughput for a particular injection rate
 
-  AddStrField( "sim_type", "latency" );
+  AddStrField( "sim_type", "mcm_gpu" );
 
   _int_map["warmup_periods"] = 3; // number of samples periods to "warm-up" the simulation
 
