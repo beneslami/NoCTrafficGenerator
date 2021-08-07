@@ -472,10 +472,6 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     }
     _slowest_flit.resize(_classes, -1);
     _slowest_packet.resize(_classes, -1);
-
-    ////
-
-
     _interface = Interface::get_instance(config, net);
     _interface->Init();
 

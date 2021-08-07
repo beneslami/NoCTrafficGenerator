@@ -25,6 +25,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _vcs = config.GetInt("num_vcs");
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
+    _flit_size = _icnt_config->GetInt("flit_width");
     vector<int> mapping = _icnt_config->GetIntArray("mapping");
     for(int i = 0; i < mapping.size(); i++) {
         _node_map[i] = mapping[i];
@@ -230,7 +231,7 @@ bool Interface::Busy() const {
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
     bool has_buffer = false;
-    std::cout << _flit_width << std::endl;
+    std::cout << _flit_size << std::endl;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     int icntID = _node_map.find(deviceID)->second;
     has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
