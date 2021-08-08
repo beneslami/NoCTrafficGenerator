@@ -53,7 +53,7 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
     } else if (sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
-        result = new static_cast<TrafficGen*>(TrafficGen::get_instance(config, net));
+        result = TrafficGen::get_instance(config, net);
         _interface = Interface::get_instance(config, net);
         std::cout << "TGEN address2: " << result << std::endl;
         std::cout << "INTE address2: " << _interface << std::endl;
