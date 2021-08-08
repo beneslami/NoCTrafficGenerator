@@ -335,7 +335,7 @@ void Interface::_CreateNodeMap(unsigned n_shader, unsigned n_node, int use_map) 
             _node_map[i] = next_node;
             next_node += 1;
         }
-        for (unsigned i = n_shader; i < n_shader+n_mem; ++i) {
+        for (unsigned i = n_shader; i < n_shader; ++i) {
             _node_map[i] = memory_node[i-n_shader];
         }
     } else { //not use preset map
