@@ -117,7 +117,7 @@ bool Simulate( BookSimConfig const & config )
 
   assert(trafficManager == NULL);
   trafficManager = TrafficManager::New( config, net ) ;
-
+  g_icnt_interface = Interface::get_instance(config, net);
   /*Start the simulation run
    */
 
