@@ -38,7 +38,7 @@ public:
     virtual ~TrafficGen();
     void Init();
     int get_size(unsigned, unsigned, unsigned);
-    void is_empty(unsigned, unsigned, unsigned);
+    bool is_empty(unsigned, unsigned, unsigned);
     friend class Interface;
 };
 
