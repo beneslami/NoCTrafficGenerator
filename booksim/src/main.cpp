@@ -53,7 +53,6 @@
 #include "network.hpp"
 #include "injection.hpp"
 #include "power_module.hpp"
-#include "interconnect_interface.hpp"
 #include "interface.h
 
 ///////////////////////////////////////////////////////////////////////////////
