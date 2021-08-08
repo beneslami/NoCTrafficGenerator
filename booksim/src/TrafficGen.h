@@ -14,6 +14,7 @@
 #include "stats.hpp"
 #include "module.hpp"
 #include "interface.h"
+#include "globals.hpp"
 #include "traffic.hpp"
 #include "routefunc.hpp"
 #include "outputset.hpp"
@@ -27,7 +28,7 @@
 
 class TrafficGen : public TrafficManager{
 protected:
-    Interface *_interface;
+
     virtual void _Step();
     virtual void _RetireFlit( Flit *, int);
     void _GeneratePacket(int, int, int, int, int, int, void* const, int);

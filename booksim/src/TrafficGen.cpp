@@ -3,7 +3,6 @@
 //
 
 #include "TrafficGen.h"
-#include <vector>
 #include "random_utils.hpp"
 
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
@@ -993,15 +992,6 @@ void TrafficGen::_GeneratePacket(int source, int packet_size, int cl, int time, 
 int TrafficGen::get_size(unsigned subnet, unsigned node, unsigned cl){
     std::cout << "subnet: " << subnet << "\tnode: " << node << "\tcl: " << cl << std::endl;
     std::cout << _input_queue.size() << std::endl;
-    for(int i = 0; i < _input_queue.size(); i++){
-        std::cout << "\t" << _input_queue[i].size() << std::endl;
-        for(int j = 0; j < _input_queue[i].size(); j++){
-            std::cout << "\t\t" << _input_queue[i][j].size() << std::endl;
-            for(int k = 0; k < _input_queue[i][j].size(); k++){
-                std::cout << "\t\t\t" << _input_queue[i][j][k].size() << std::endl;
-            }
-        }
-    }
     return _input_queue[subnet][node][cl].size();
 }
 
