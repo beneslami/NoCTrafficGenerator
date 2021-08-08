@@ -80,7 +80,6 @@ private:
     SocketStream *_channel;
     std::string _host;
     int _port;
-
     IntersimConfig* _icnt_config;
     map<unsigned, unsigned> _node_map;
     map<unsigned, unsigned> _reverse_node_map;

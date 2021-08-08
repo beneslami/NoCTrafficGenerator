@@ -36,10 +36,13 @@
 #include "booksim_config.hpp"
 
 BookSimConfig::BookSimConfig( )
-{ 
+{
+
   //========================================================
   // Network options
   //========================================================
+    AddStrField("_host", "127.0.0.1");
+    _int_map["_port"] = 20211;
 
   // Channel length listing file
   AddStrField( "channel_file", "" ) ;
