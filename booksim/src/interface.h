@@ -14,6 +14,7 @@
 #include "intersim_config.hpp"
 #include "netstream/messages.h"
 #include "networks/network.hpp"
+#include "MCMGPUTrafficManager.h"
 #include "netstream/socketstream.h"
 
 class TrafficGen;
@@ -81,6 +82,7 @@ private:
     std::string _host;
     int _port;
     IntersimConfig* _icnt_config;
+    MCMGPUTrafficManager *_traffic_manager;
     map<unsigned, unsigned> _node_map;
     map<unsigned, unsigned> _reverse_node_map;
     vector<vector<int> > _round_robin_turn;

@@ -7,7 +7,7 @@
 #include "globals.hpp"
 #include <stddef.h>
 
-Interface* Interface::interface_result = NULL;
+Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
     if(interface_result == NULL){
         interface_result = new Interface(config, net);
@@ -34,6 +34,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
+    _traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
     Init();
 }
 

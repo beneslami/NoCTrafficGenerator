@@ -18,6 +18,8 @@ class MCMGPUTrafficManager : public TrafficManager{
 protected:
     vector<vector<vector<list<Flit *> > > > _input_queue;
 public:
+    static MCMGPUTrafficManager *address;
+    static MCMGPUTrafficManager* get_instance(const Configuration &config, const vector<Network *> & net);
     MCMGPUTrafficManager(const Configuration &config, const vector<Network *> & net);
     virtual ~MCMGPUTrafficManager();
 };
