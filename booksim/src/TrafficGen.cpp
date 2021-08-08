@@ -990,9 +990,11 @@ void TrafficGen::_GeneratePacket(int source, int packet_size, int cl, int time, 
 }
 
 int TrafficGen::get_size(unsigned subnet, unsigned node, unsigned cl){
+    std::cout << "subnet: " << subent << "\tnode: " << node << "\tcl: " << cl << std::endl;
     return _input_queue[subnet][node][cl].size();
 }
 
 bool TrafficGen::is_empty(unsigned subnet, unsigned node, unsigned cl){
+    std::cout << "subnet: " << subent << "\tnode: " << node << "\tcl: " << cl << std::endl;
     return _input_queue[subnet][node][cl].empty() ? 1 : 0;
 }
