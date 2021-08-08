@@ -109,7 +109,7 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
-                //Flit* f = (Flit*)(pop(ejReq->size));
+                /*Flit* f = (Flit*)(pop(ejReq->size));
                 EjectResMsg _res;
                 _res.source = f->src;
                 _res.dest = f->dest;
@@ -117,7 +117,7 @@ int Interface::Step() {
                 _res.id = f->id;
                 _res.network = f->subnetwork;
                 _res.cl = f->cl;
-                *_channel << _res;
+                *_channel << _res;*/
                 break;
             }
             case EJECT_RES: {
