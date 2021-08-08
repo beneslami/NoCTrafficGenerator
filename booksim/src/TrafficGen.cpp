@@ -994,5 +994,5 @@ int TrafficGen::get_size(unsigned subnet, unsigned node, unsigned cl){
 }
 
 bool TrafficGen::is_empty(unsigned subnet, unsigned node, unsigned cl){
-    return _input_queue[subnet][node][cl].empty() : 1 ? 0;
+    return _input_queue[subnet][node][cl].empty() ? 1 : 0;
 }
