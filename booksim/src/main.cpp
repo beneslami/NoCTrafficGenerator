@@ -53,7 +53,7 @@
 #include "network.hpp"
 #include "injection.hpp"
 #include "power_module.hpp"
-#include "interface.h
+#include "interface.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global declarations
