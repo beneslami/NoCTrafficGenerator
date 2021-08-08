@@ -31,7 +31,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
-    _traffic_manager = <static_cast<TrafficGen*>(TrafficManager::New(config, net));
+    _traffic_manager = static_cast<TrafficGen*>(TrafficManager::New(config, net));
     std::cout << "TGEN address1: " << _traffic_manager << std::end;
     /*vector<int> mapping = _icnt_config->GetIntArray("mapping");
     for(int i = 0; i < mapping.size(); i++) {
