@@ -1,7 +1,7 @@
-// $Id: flit.hpp 5188 2012-08-30 00:31:31Z dub $
+// $Id$
 
 /*
- Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,9 @@ public:
 
   const static int NUM_FLIT_TYPES = 5;
   enum FlitType { READ_REQUEST  = 0, 
-		  READ_REPLY    = 1,
-		  WRITE_REQUEST = 2,
-		  WRITE_REPLY   = 3,
+                  READ_REPLY    = 1,
+		          WRITE_REQUEST = 2,
+		          WRITE_REPLY   = 3,
                   ANY_TYPE      = 4 };
   FlitType type;
 

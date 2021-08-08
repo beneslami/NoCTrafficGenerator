@@ -1,7 +1,7 @@
-// $Id: flitchannel.cpp 5188 2012-08-30 00:31:31Z dub $
+// $Id$
 
 /*
- Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -43,11 +43,11 @@
 // ----------------------------------------------------------------------
 //  $Author: jbalfour $
 //  $Date: 2007/06/27 23:10:17 $
-//  $Id: flitchannel.cpp 5188 2012-08-30 00:31:31Z dub $
+//  $Id$
 // ----------------------------------------------------------------------
 FlitChannel::FlitChannel(Module * parent, string const & name, int classes)
 : Channel<Flit>(parent, name), _routerSource(NULL), _routerSourcePort(-1), 
-  _routerSink(NULL), _routerSinkPort(-1), _idle(0), _classes(classes) {
+  _routerSink(NULL), _routerSinkPort(-1), _idle(0) {
   _active.resize(classes, 0);
 }
 

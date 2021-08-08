@@ -1,7 +1,7 @@
-// $Id: random_utils.hpp 5188 2012-08-30 00:31:31Z dub $
+// $Id$
 
 /*
- Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,9 @@
 #ifndef _RANDOM_UTILS_HPP_
 #define _RANDOM_UTILS_HPP_
 
- // interface to Knuth's RANARRAY RNG
+#include <vector>
+
+// interface to Knuth's RANARRAY RNG
 void   ran_start(long seed);
 long   ran_next( );
 void   ranf_start(long seed);
@@ -57,5 +59,11 @@ inline double RandomFloat(  ) {
 inline double RandomFloat( double max ) {
   return ( ranf_next( ) * max );
 }
+
+// Saves the current generator state
+void SaveRandomState( std::vector<long> & save_x, std::vector<double> & save_u );
+
+// Restores the generator state from previously saved values
+void RestoreRandomState( std::vector<long> const & save_x, std::vector<double> const & save_u );
 
 #endif
