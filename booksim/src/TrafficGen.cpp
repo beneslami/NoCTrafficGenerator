@@ -482,10 +482,6 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
             _input_queue[subnet][node].resize(_classes);
         }
     }
-    std::cout << _input_queue.size() << std::endl;
-    for(int i = 0; i < _input_queue.size(); i++) {
-        std::cout << _input_queue[i].size();
-    }
     _time = 0;
     _sim_state = running;
 }
