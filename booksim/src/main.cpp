@@ -61,7 +61,7 @@
 //////////////////////
 
  /* the current traffic manager instance */
-TrafficManager * trafficManager = NULL;
+TrafficGen * trafficManager = NULL;
 Interface *_interface = NULL;
 
 int GetSimTime() {
