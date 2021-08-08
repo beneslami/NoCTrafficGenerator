@@ -43,7 +43,7 @@ BookSimConfig::BookSimConfig( )
   //========================================================
     AddStrField("_host", "127.0.0.1");
     _int_map["_port"] = 20211;
-    _int_map["input_buffer_size"] = 0;
+    //_int_map["input_buffer_size"] = 0;
 
   // Channel length listing file
   AddStrField( "channel_file", "" ) ;
