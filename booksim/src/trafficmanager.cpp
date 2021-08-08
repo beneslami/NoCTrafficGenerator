@@ -1971,145 +1971,113 @@ int kain_traverse_max_flit_reply = 0;
 int kain_traverse_max_flit_request = 0;
 
 void TrafficManager::DisplayStats(ostream & os) const {
-  
-  for(int c = 0; c < _classes; ++c) {
-    
-    if(_measure_stats[c] == 0) {
-      continue;
-    }
-    
-    cout << "Class " << c << ":" << endl;
-    
-    cout
-    << "Packet latency average = " << _plat_stats[c]->Average() << endl
-    << "\tminimum = " << _plat_stats[c]->Min() << endl
-    << "\tmaximum = " << _plat_stats[c]->Max() << endl
-    << "Network latency average = " << _nlat_stats[c]->Average() << endl
-    << "\tminimum = " << _nlat_stats[c]->Min() << endl
-    << "\tmaximum = " << _nlat_stats[c]->Max() << endl
-    << "Slowest packet = " << _slowest_packet[c] << endl
-    << "Flit latency average = " << _flat_stats[c]->Average() << endl
-    << "\tminimum = " << _flat_stats[c]->Min() << endl
-    << "\tmaximum = " << _flat_stats[c]->Max() << endl
-    << "Slowest flit = " << _slowest_flit[c] << endl
-    << "Fragmentation average = " << _frag_stats[c]->Average() << endl
-    << "\tminimum = " << _frag_stats[c]->Min() << endl
-    << "\tmaximum = " << _frag_stats[c]->Max() << endl;
-    
-    int count_sum, count_min, count_max;
-    double rate_sum, rate_min, rate_max;
-    double rate_avg;
-    int sent_packets, sent_flits, accepted_packets, accepted_flits;
-    int min_pos, max_pos;
-    double time_delta = (double)(_time - _reset_time);
-    _ComputeStats(_sent_packets[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
-    rate_sum = (double)count_sum / time_delta;
-    rate_min = (double)count_min / time_delta;
-    rate_max = (double)count_max / time_delta;
-    rate_avg = rate_sum / (double)_nodes;
-    sent_packets = count_sum;
-    cout << "Injected packet rate average = " << rate_avg << endl
-    << "\tminimum = " << rate_min
-    << " (at node " << min_pos << ")" << endl
-    << "\tmaximum = " << rate_max
-    << " (at node " << max_pos << ")" << endl;
-    _ComputeStats(_accepted_packets[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
-    rate_sum = (double)count_sum / time_delta;
-    rate_min = (double)count_min / time_delta;
-    rate_max = (double)count_max / time_delta;
-    rate_avg = rate_sum / (double)_nodes;
-    accepted_packets = count_sum;
-    cout << "Accepted packet rate average = " << rate_avg << endl
-    << "\tminimum = " << rate_min
-    << " (at node " << min_pos << ")" << endl
-    << "\tmaximum = " << rate_max
-    << " (at node " << max_pos << ")" << endl;
-    _ComputeStats(_sent_flits[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
-    rate_sum = (double)count_sum / time_delta;
-    rate_min = (double)count_min / time_delta;
-    rate_max = (double)count_max / time_delta;
-    rate_avg = rate_sum / (double)_nodes;
-    sent_flits = count_sum;
-    cout << "Injected flit rate average = " << rate_avg << endl
-    << "\tminimum = " << rate_min
-    << " (at node " << min_pos << ")" << endl
-    << "\tmaximum = " << rate_max
-    << " (at node " << max_pos << ")" << endl;
 
-    cout << "KAIN_traverse_max_request_one_cycle = " << kain_traverse_max_flit_request <<endl;
-    cout << "KAIN_traverse_max_reply_one_cycle = " << kain_traverse_max_flit_reply <<endl;
-    
-    extern std::vector<int> KAIN_cluster_port_receive[8];
-    extern std::vector<int> KAIN_cluster_receive;
-    extern std::vector<int> KAIN_all_port_receive;
+    for(int c = 0; c < _classes; ++c) {
 
-    float sum = 0.0; 
-    for(int i = 0; i < 8; i++) 
-    {    
-        float average = (float)accumulate( KAIN_cluster_port_receive[i].begin(), KAIN_cluster_port_receive[i].end(), 0)/(float)KAIN_cluster_port_receive[i].size();
-        sum += average; 
-    }    
+        if(_measure_stats[c] == 0) {
+            continue;
+        }
 
-//    printf("KAIN_port_parallelisum = %lf\n",sum/8.0);
-//    printf("KAIN_cluster_parallelisum = %lf\n",(float)accumulate( KAIN_cluster_receive.begin(), KAIN_cluster_receive.end(), 0)/(float)KAIN_cluster_receive.size());
-    printf("KAIN_all_port_parallelisum = %lf\n",(float)accumulate( KAIN_all_port_receive.begin(), KAIN_all_port_receive.end(), 0)/(float)KAIN_all_port_receive.size());
+        cout << "Class " << c << ":" << endl;
 
+        cout << "Minimum packet latency = " << _plat_stats[c]->Min() << endl
+             << "Average packet latency = " << _plat_stats[c]->Average() << endl
+             << "Maximum packet latency = " << _plat_stats[c]->Max() << endl
+             << "Minimum network latency = " << _nlat_stats[c]->Min() << endl
+             << "Average network latency = " << _nlat_stats[c]->Average() << endl
+             << "Maximum network latency = " << _nlat_stats[c]->Max() << endl
+             << "Slowest packet = " << _slowest_packet[c] << endl
+             << "Minimum flit latency = " << _flat_stats[c]->Min() << endl
+             << "Average flit latency = " << _flat_stats[c]->Average() << endl
+             << "Maximum flit latency = " << _flat_stats[c]->Max() << endl
+             << "Slowest flit = " << _slowest_flit[c] << endl
+             << "Minimum fragmentation = " << _frag_stats[c]->Min() << endl
+             << "Average fragmentation = " << _frag_stats[c]->Average() << endl
+             << "Maximum fragmentation = " << _frag_stats[c]->Max() << endl;
+
+        int count_sum, count_min, count_max;
+        double rate_sum, rate_min, rate_max;
+        double rate_avg;
+        int sent_packets, sent_flits, accepted_packets, accepted_flits;
+        int min_pos, max_pos;
+        double time_delta = (double)(_time - _reset_time);
+        _ComputeStats(_sent_packets[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
+        rate_sum = (double)count_sum / time_delta;
+        rate_min = (double)count_min / time_delta;
+        rate_max = (double)count_max / time_delta;
+        rate_avg = rate_sum / (double)_nodes;
+        sent_packets = count_sum;
+        cout << "Minimum injected packet rate = " << rate_min
+             << " (at node " << min_pos << ")" << endl
+             << "Average injected packet rate = " << rate_avg << endl
+             << "Maximum injected packet rate = " << rate_max
+             << " (at node " << max_pos << ")" << endl;
+        _ComputeStats(_accepted_packets[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
+        rate_sum = (double)count_sum / time_delta;
+        rate_min = (double)count_min / time_delta;
+        rate_max = (double)count_max / time_delta;
+        rate_avg = rate_sum / (double)_nodes;
+        accepted_packets = count_sum;
+        cout << "Minimum accepted packet rate = " << rate_min
+             << " (at node " << min_pos << ")" << endl
+             << "Average accepted packet rate = " << rate_avg << endl
+             << "Maximum accepted packet rate = " << rate_max
+             << " (at node " << max_pos << ")" << endl;
+        _ComputeStats(_sent_flits[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
+        rate_sum = (double)count_sum / time_delta;
+        rate_min = (double)count_min / time_delta;
+        rate_max = (double)count_max / time_delta;
+        rate_avg = rate_sum / (double)_nodes;
+        sent_flits = count_sum;
+        cout << "Minimum injected flit rate = " << rate_min
+             << " (at node " << min_pos << ")" << endl
+             << "Average injected flit rate = " << rate_avg << endl
+             << "Maximum injected flit rate = " << rate_max
+             << " (at node " << max_pos << ")" << endl;
+        _ComputeStats(_accepted_flits[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
+        rate_sum = (double)count_sum / time_delta;
+        rate_min = (double)count_min / time_delta;
+        rate_max = (double)count_max / time_delta;
+        rate_avg = rate_sum / (double)_nodes;
+        accepted_flits = count_sum;
+        cout << "Minimum accepted flit rate = " << rate_min
+             << " (at node " << min_pos << ")" << endl
+             << "Average accepted flit rate = " << rate_avg << endl
+             << "Maximum accepted flit rate = " << rate_max
+             << " (at node " << max_pos << ")" << endl;
+
+        cout << "Average injected packet length = " << (double)sent_flits / (double)sent_packets << endl
+             << "Average accepted packet length = " << (double)accepted_flits / (double)accepted_packets << endl;
+
+        cout << "Total in-flight flits = " << _total_in_flight_flits[c].size()
+             << " (" << _measured_in_flight_flits[c].size() << " measured)"
+             << endl;
 
 
-    extern std::vector<float> KAIN_contention_total_number;
-    extern std::vector<float> KAIN_contention_failed_number;
-    extern std::vector<float> KAIN_contention_portion;
-
-
-    cout << "KAIN_NOC_average_total_flits = " << (float)accumulate( KAIN_contention_total_number.begin(), KAIN_contention_total_number.end(), 0.0)/(float)KAIN_contention_total_number.size()  <<endl;
-    cout << "KAIN_NOC_average_stall_flits = " << (float)accumulate( KAIN_contention_failed_number.begin(), KAIN_contention_failed_number.end(), 0.0)/(float)KAIN_contention_failed_number.size()  <<endl;
-    cout << "KAIN_NOC_average_stall_portion= " << (float)accumulate( KAIN_contention_portion.begin(), KAIN_contention_portion.end(), 0.0)/(float)KAIN_contention_portion.size()  <<endl;
-
-
-
-    _ComputeStats(_accepted_flits[c], &count_sum, &count_min, &count_max, &min_pos, &max_pos);
-    rate_sum = (double)count_sum / time_delta;
-    rate_min = (double)count_min / time_delta;
-    rate_max = (double)count_max / time_delta;
-    rate_avg = rate_sum / (double)_nodes;
-    accepted_flits = count_sum;
-    cout << "Accepted flit rate average= " << rate_avg << endl
-    << "\tminimum = " << rate_min
-    << " (at node " << min_pos << ")" << endl
-    << "\tmaximum = " << rate_max
-    << " (at node " << max_pos << ")" << endl;
-    
-    cout << "Injected packet length average = " << (double)sent_flits / (double)sent_packets << endl
-    << "Accepted packet length average = " << (double)accepted_flits / (double)accepted_packets << endl;
-    
-    cout << "Total in-flight flits = " << _total_in_flight_flits[c].size()
-    << " (" << _measured_in_flight_flits[c].size() << " measured)"
-    << endl;
-    
 #ifdef TRACK_STALLS
-    _ComputeStats(_buffer_busy_stalls[c], &count_sum);
-    rate_sum = (double)count_sum / time_delta;
-    rate_avg = rate_sum / (double)(_subnets*_routers);
-    os << "Buffer busy stall rate = " << rate_avg << endl;
-    _ComputeStats(_buffer_conflict_stalls[c], &count_sum);
-    rate_sum = (double)count_sum / time_delta;
-    rate_avg = rate_sum / (double)(_subnets*_routers);
-    os << "Buffer conflict stall rate = " << rate_avg << endl;
-    _ComputeStats(_buffer_full_stalls[c], &count_sum);
-    rate_sum = (double)count_sum / time_delta;
-    rate_avg = rate_sum / (double)(_subnets*_routers);
-    os << "Buffer full stall rate = " << rate_avg << endl;
-    _ComputeStats(_buffer_reserved_stalls[c], &count_sum);
-    rate_sum = (double)count_sum / time_delta;
-    rate_avg = rate_sum / (double)(_subnets*_routers);
-    os << "Buffer reserved stall rate = " << rate_avg << endl;
-    _ComputeStats(_crossbar_conflict_stalls[c], &count_sum);
-    rate_sum = (double)count_sum / time_delta;
-    rate_avg = rate_sum / (double)(_subnets*_routers);
-    os << "Crossbar conflict stall rate = " << rate_avg << endl;
+        _ComputeStats(_buffer_busy_stalls[c], &count_sum);
+		rate_sum = (double)count_sum / time_delta;
+		rate_avg = rate_sum / (double)(_subnets*_routers);
+		os << "Buffer busy stall rate = " << rate_avg << endl;
+		_ComputeStats(_buffer_conflict_stalls[c], &count_sum);
+		rate_sum = (double)count_sum / time_delta;
+		rate_avg = rate_sum / (double)(_subnets*_routers);
+		os << "Buffer conflict stall rate = " << rate_avg << endl;
+		_ComputeStats(_buffer_full_stalls[c], &count_sum);
+		rate_sum = (double)count_sum / time_delta;
+		rate_avg = rate_sum / (double)(_subnets*_routers);
+		os << "Buffer full stall rate = " << rate_avg << endl;
+		_ComputeStats(_buffer_reserved_stalls[c], &count_sum);
+		rate_sum = (double)count_sum / time_delta;
+		rate_avg = rate_sum / (double)(_subnets*_routers);
+		os << "Buffer reserved stall rate = " << rate_avg << endl;
+		_ComputeStats(_crossbar_conflict_stalls[c], &count_sum);
+		rate_sum = (double)count_sum / time_delta;
+		rate_avg = rate_sum / (double)(_subnets*_routers);
+		os << "Crossbar conflict stall rate = " << rate_avg << endl;
 #endif
-    
-  }
+
+    }
 }
 
 void TrafficManager::DisplayOverallStats( ostream & os ) const {
