@@ -998,7 +998,7 @@ int TrafficGen::get_size(unsigned subnet, unsigned node, unsigned cl){
         for(int j = 0; j < _input_queue[i].size(); j++){
             std::cout << "\t\t" << _input_queue[i][j].size() << std::endl;
             for(int k = 0; k < _input_queue[i][j].size(); k++){
-                std::cout << "\t\t\t" << _input_queue[i][j][k] << std::endl;
+                std::cout << "\t\t\t" << _input_queue[i][j][k].size() << std::endl;
             }
         }
     }
