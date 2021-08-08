@@ -988,3 +988,11 @@ void TrafficGen::_GeneratePacket(int source, int packet_size, int cl, int time, 
         _input_queue[subnet][source][cl].push_back(f);
     }
 }
+
+int TrafficGen::get_size(unsigned subnet, unsigned node, unsigned cl){
+    return _input_queue[subnet][node][cl].size();
+}
+
+bool TrafficGen::is_empty(unsigned subnet, unsigned node, unsigned cl){
+    return _input_queue[subnet][node][cl].empty() : 1 ? 0;
+}

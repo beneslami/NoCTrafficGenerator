@@ -62,7 +62,6 @@ int Interface::Init() {
     std::cout << req.type <<  ":Receiving initiation packet from Traffic Generator\n";
     std::cout << res.type << ": Sending response to Traffic Generator\n";
     std::cout << "==================Initialization Completed==================\n";
-    std::cout << _traffic_manager->_input_queue.size() << std::endl;
     return 0;
 }
 
@@ -220,7 +219,7 @@ bool Interface::Busy() const {
         for (int s = 0; s < _subnets; ++s) {
             for (unsigned n = 0; n < _n_shader; ++n) {
                 //FIXME: if this cannot make sure _partial_packets is empty
-                assert(_traffic_manager->_input_queue[s][n][0].empty());
+                assert(_traffic_manager->is_empty(s, n, 0));
             }
         }
     } else {
@@ -251,9 +250,9 @@ bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     //int icntID = _node_map.find(deviceID)->second;
     int icntID = deviceID;
-    has_buffer = (_traffic_manager->_input_queue[0][icntID][0].size() + n_flits <= _input_buffer_capacity);
+    has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
     if ((_subnets > 1))
-        has_buffer = (_traffic_manager->_input_queue[1][icntID][0].size() +n_flits <= _input_buffer_capacity);
+        has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
     return has_buffer;
 }
 
