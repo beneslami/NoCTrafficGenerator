@@ -29,7 +29,8 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
-    _CreateBuffer();
+    Init();
+    //_CreateBuffer();
     //_CreateNodeMap(_n_shader, _traffic_manager->_nodes, _icnt_config->GetInt("use_map"));
     //InitializeRoutingMap(*_icnt_config);
 }
@@ -57,6 +58,7 @@ int Interface::Init() {
     return 0;
 }
 
+/*
 void Interface::_CreateBuffer() {
     unsigned nodes = _n_shader;
 
@@ -77,7 +79,7 @@ void Interface::_CreateBuffer() {
         }
     }
 }
-
+*/
 int Interface::Step() {
     bool process_more = true;
     StreamMessage *msg = NULL;
@@ -87,7 +89,7 @@ int Interface::Step() {
             case STEP_REQ: {
                 StepResMsg step;
                 *_channel << step;
-                process_more = false;
+                //process_more = false;
                 break;
             }
             case INJECT_REQ: {
@@ -136,7 +138,7 @@ int Interface::Step() {
         StreamMessage::destroy(msg);
     }
 }
-
+/*
 void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int packet_type) {
     assert(HasBuffer(input_deviceID, size));
     //int output_icntID = _node_map[output_deviceID];
@@ -231,7 +233,7 @@ bool Interface::Busy() const {
 
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
-    /*
+
       READ_REQUEST  = 0,
       READ_REPLY    = 1,
       WRITE_REQUEST = 2,
@@ -245,9 +247,10 @@ bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
     has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
     if ((_subnets > 1))
         has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
-    return has_buffer;*/
-}
+    return has_buffer;
+}*/
 
+/*
 void* Interface::_BoundaryBufferItem::PopPacket()
 {
     assert (_packet_n);
@@ -288,3 +291,4 @@ void Interface::_BoundaryBufferItem::PushFlitData(void* data,bool is_tail)
         _packet_n++;
     }
 }
+*/

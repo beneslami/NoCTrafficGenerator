@@ -18,7 +18,7 @@ TrafficGen* TrafficGen::get_instance(const Configuration &config, const vector<N
 }
 
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
-    _nodes = _net[0]->NumNodes();
+    /*_nodes = _net[0]->NumNodes();
     _routers = _net[0]->NumRouters();
     _vcs = config.GetInt("num_vcs");
     _flit_width = config.GetInt( "flit_width" );
@@ -485,7 +485,7 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     _slowest_flit.resize(_classes, -1);
     _slowest_packet.resize(_classes, -1);
     _interface = Interface::get_instance(config, net);
-    _interface->Init();
+    _interface->Init();*/
 
     _input_queue.resize(_subnets);
     for ( int subnet = 0; subnet < _subnets; ++subnet) {
@@ -494,8 +494,6 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
             _input_queue[subnet][node].resize(_classes);
         }
     }
-    _time = 0;
-    _sim_state = running;
 }
 
 TrafficGen::~TrafficGen(){
