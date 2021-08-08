@@ -135,8 +135,8 @@ void TrafficGenerator::Eject() {
     EjectReqMsg request;
     EjectResMsg response;
     bool hasRequests = true;
-    for(int i = 0 ; i < _numCore; i++){
-        while(hasRequests) {
+    for(int i = 0 ; i < _numCore; i++) {
+        while (hasRequests) {
             m_channel << request >> response;
             if (response.msgType == READ_REQUEST || response.msgType == WRITE_REQUEST) {
                 struct InjectResMsg response_back;
@@ -150,19 +150,20 @@ void TrafficGenerator::Eject() {
                 response_back.type = INJECT_RES;
                 response_back.id = response.id;
                 Core_queues[response_back.source]->Enqueue_response(response_back, cycle);
-            }
-            else if (response.msgType == READ_REPLY || response.msgType == WRITE_REPLY) {
+            } else if (response.msgType == READ_REPLY || response.msgType == WRITE_REPLY) {
                 std::map<int, InjectReqMsg>::iterator it = inTransitPackets.find(response.id);
                 if (it == inTransitPackets.end()) {
                     std::cerr << "Error: couldn't find in transit packet " << response.id << std::endl;
                     exit(-1);
                 }
                 /* Need to check if the packet belongs to current node or not. if yes, then it's done, otherwise, it should re-inject to Booksim */
-                std::cout << "src: " << response.source << "\tdst: " << response.dest << "\tsize: " << response.packetSize
+                std::cout << "src: " << response.source << "\tdst: " << response.dest << "\tsize: "
+                          << response.packetSize
                           << " is received in cycle: " << cycle << "\n";
             }
             hasRequests = response.remainingRequests;
         }
+    }
 #endif
 }
 
