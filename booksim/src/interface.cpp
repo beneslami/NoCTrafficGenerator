@@ -4,7 +4,6 @@
 #include "interface.h"
 #include "routefunc.hpp"
 #include "config_utils.hpp"
-#include "TrafficGen.h"
 #include "globals.hpp"
 #include <stddef.h>
 
