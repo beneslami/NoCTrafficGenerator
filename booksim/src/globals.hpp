@@ -34,6 +34,8 @@
 /*all declared in main.cpp*/
 class Interface;
 extern Interface *_interface;
+class TrafficGen;
+extern TrafficGen *_traffic_manager;
 
 int GetSimTime();
 

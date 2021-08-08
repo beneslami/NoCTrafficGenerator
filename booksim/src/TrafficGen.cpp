@@ -476,7 +476,6 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     _interface->Init();
 
     _input_queue.resize(_subnets);
-    std::cout << _input_queue.size() <<  std::endl;
     for ( int subnet = 0; subnet < _subnets; ++subnet) {
         _input_queue[subnet].resize(_nodes);
         for ( int node = 0; node < _nodes; ++node ) {

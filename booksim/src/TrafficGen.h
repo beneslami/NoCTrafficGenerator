@@ -28,7 +28,6 @@
 
 class TrafficGen : public TrafficManager{
 protected:
-
     virtual void _Step();
     virtual void _RetireFlit( Flit *, int);
     void _GeneratePacket(int, int, int, int, int, int, void* const, int);

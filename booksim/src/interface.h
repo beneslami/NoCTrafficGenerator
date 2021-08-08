@@ -9,6 +9,7 @@
 #include <queue>
 #include <fstream>
 #include "module.hpp"
+#include "globals.hpp"
 #include "config_utils.hpp"
 #include "netstream/messages.h"
 #include "networks/network.hpp"
@@ -83,7 +84,6 @@ private:
     int _subnets;
     unsigned _flit_size;
     IntersimConfig* _icnt_config;
-    TrafficGen *_traffic_manager;
     map<unsigned, unsigned> _node_map;
     map<unsigned, unsigned> _reverse_node_map;
     vector<vector<int> > _round_robin_turn;
