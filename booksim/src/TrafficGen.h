@@ -32,8 +32,6 @@ protected:
     virtual void _RetireFlit( Flit *, int);
     void _GeneratePacket(int, int, int, int, int, int, void* const, int);
     vector<vector<vector<list<Flit *> > > > _input_queue;
-    int  _flit_width;
-    int _ideal_interconnect;
 public:
     static TrafficGen* result;
     TrafficGen(const Configuration &, const vector<Network *> &);
