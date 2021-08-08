@@ -46,7 +46,7 @@ BookSimConfig::BookSimConfig( )
     _int_map["input_buffer_size"] = 122880;
     _int_map["ejection_buffer_size"] = 122880; // if left zero the simulator will use the vc_buf_size instead
     _int_map["boundary_buffer_size"] = 122880;
-    AddStrField("mapping", "{0,0,1,1,2,2,3,3}")
+    AddStrField("mapping", "{0,0,1,1,2,2,3,3}");
   // Channel length listing file
   AddStrField( "channel_file", "" ) ;
 
