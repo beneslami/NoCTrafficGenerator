@@ -125,15 +125,21 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
-                /*Flit* f = (Flit*)(pop(ejReq->size));
+                //Flit* f = (Flit*)(pop(ejReq->size));
                 EjectResMsg _res;
-                _res.source = f->src;
-                _res.dest = f->dest;
-                _res.msgType = f->type;
-                _res.id = f->id;
-                _res.network = f->subnetwork;
-                _res.cl = f->cl;
-                *_channel << _res;*/
+                if(f) {
+                    _res.source = f->src;
+                    _res.dest = f->dest;
+                    _res.msgType = f->type;
+                    _res.id = f->id;
+                    _res.network = f->subnetwork;
+                    _res.cl = f->cl;
+                }
+                else{
+                    _res.source = -1;
+                    _res.dest = -1;  /* source and destination -1 means no packet to eject */
+                }
+                *_channel << _res;
                 break;
             }
             case EJECT_RES: {

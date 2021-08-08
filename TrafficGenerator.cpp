@@ -239,7 +239,7 @@ void TrafficGenerator::Run() {
             }
             std::cout << "cycle: " << cycle << std::endl;
             Inject();
-            //Eject();
+            Eject();
             cycle += threshold;
 
 #if CONNECT
