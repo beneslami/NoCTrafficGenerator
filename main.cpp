@@ -23,7 +23,6 @@ int main(int argc, char **argv){
     numCycles = std::stoull(argv[2]);
     numCores = std::stoi(argv[3]);
     readModel(modelFile);
-    std::cout << "1 \n ";
     TrafficGenerator TGen = TrafficGenerator(numCores);
     auto start = std::chrono::high_resolution_clock::now();
     TGen.Run();

@@ -127,9 +127,7 @@ TrafficGenerator::TrafficGenerator(int numCore) {
 }
 
 TrafficGenerator::~TrafficGenerator() {
-    for(int i = 0; i < _numCore; i++){
-        delete[] Core_queues[i];
-    }
+
 }
 
 void TrafficGenerator::Eject() {
@@ -250,8 +248,9 @@ void TrafficGenerator::Run() {
 		    m_channel << req >> res;
 #endif
         }
+        exit();
     }
-    exit();
+
 }
 
 void TrafficGenerator::Run2() {
