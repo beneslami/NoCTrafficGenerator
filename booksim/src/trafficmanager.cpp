@@ -976,31 +976,7 @@ void TrafficManager::_Step( )
                                << " from VC " << f->vc
                                << "." << endl;
                 }
-                _interface->WriteOutBuffer(subnet, n, f);  //Added by Me
             }
-            _interface->Transfer2BoundaryBuffer(subnet, n);   // Added by me: Start
-            Flit *const ejected_flit = _interface->GetEjectedFlit(subnet, n);
-            std::cout << _sample_period << std::endl;
-            if (ejected_flit) {
-                if (ejected_flit->head)
-                    assert(ejected_flit->dest == n);
-                if (ejected_flit->watch) {
-                    *gWatchOut << GetSimTime() << " | "
-                               << "node" << n << " | "
-                               << "Ejected flit " << ejected_flit->id
-                               << " (packet " << ejected_flit->pid
-                               << " VC " << ejected_flit->vc << ")"
-                               << "from ejection buffer." << endl;
-                }
-                flits[subnet].insert(make_pair(n, f));
-                if((_sim_state == warming_up) || (_sim_state == running)) {
-                    ++_accepted_flits[f->cl][n];
-                    if(f->tail) {
-                        ++_accepted_packets[f->cl][n];
-                    }
-                }
-            }                                                   // Added by me: end
-
             Credit * const c = _net[subnet]->ReadCredit( n );
             if ( c ) {
 #ifdef TRACK_FLOWS
