@@ -35,12 +35,8 @@ protected:
 public:
     static TrafficGen* result;
     TrafficGen(const Configuration &, const vector<Network *> &);
-    virtual ~TrafficGen();
     void Init();
     static TrafficGen* get_instance(const Configuration &, const vector<Network *> &);
-    int get_size(unsigned, unsigned, unsigned);
-    bool is_empty(unsigned, unsigned, unsigned);
-    friend class Interface;
 };
 
 #endif

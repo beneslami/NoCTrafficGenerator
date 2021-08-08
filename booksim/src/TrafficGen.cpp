@@ -495,7 +495,3 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
         }
     }
 }
-
-TrafficGen::~TrafficGen(){
-
-}
