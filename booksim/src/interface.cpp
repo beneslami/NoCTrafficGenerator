@@ -62,6 +62,10 @@ int Interface::Init() {
     std::cout << req.type <<  ":Receiving initiation packet from Traffic Generator\n";
     std::cout << res.type << ": Sending response to Traffic Generator\n";
     std::cout << "==================Initialization Completed==================\n";
+    std::cout << _traffic_manager->_input_queue.size() << std::endl;
+    for(int i = 0; i < _traffic_manager->_input_queue.size(); i++) {
+        std::cout << _traffic_manager->_input_queue[i].size();
+    }
     return 0;
 }
 
