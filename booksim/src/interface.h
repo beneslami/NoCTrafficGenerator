@@ -77,7 +77,7 @@ private:
     SocketStream *_channel;
     std::string _host;
     int _port;
-
+    TrafficGen *_traffic_manager;
     unsigned _n_shader;
     vector<Network *> _net;
     int _vcs;

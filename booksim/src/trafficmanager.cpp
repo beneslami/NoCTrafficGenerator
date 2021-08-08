@@ -53,6 +53,7 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
         result = new TrafficGen(config, net);
+        std::cout << "address2: " << result << std::end;
     }
     else
         cerr << "Unknown simulation type: " << sim_type << endl;
