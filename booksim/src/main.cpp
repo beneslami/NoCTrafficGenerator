@@ -61,7 +61,7 @@
 //////////////////////
 
  /* the current traffic manager instance */
-TrafficGen *_traffic_manager; = NULL;
+TrafficManager * trafficManager = NULL;
 Interface *_interface = NULL;
 
 int GetSimTime() {
@@ -115,7 +115,7 @@ bool Simulate( BookSimConfig const & config )
    */
 
   assert(trafficManager == NULL);
-  trafficManager = static_cast<TrafficGen*>(TrafficManager::New( config, net ));
+  trafficManager = TrafficManager::New( config, net ) ;
 
   /*Start the simulation run
    */
