@@ -21,8 +21,6 @@ Interface* Interface::get_instance(Configuration const & config, vector<Network 
 Interface::Interface(const Configuration &config, const vector<Network *> &net) {
     _channel = NULL;
     _icnt_config = new IntersimConfig();
-    _subnets = _icnt_config->GetInt("subnets");
-    _vcs = config.GetInt("num_vcs");
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
     _flit_size = _icnt_config->GetInt("flit_width");
@@ -31,17 +29,9 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
-    _traffic_manager = static_cast<TrafficGen*>(TrafficManager::New(config, net));
-    std::cout << "TGEN address1: " << _traffic_manager << std::endl;
-    /*vector<int> mapping = _icnt_config->GetIntArray("mapping");
-    for(int i = 0; i < mapping.size(); i++) {
-        _node_map[i] = mapping[i];
-    }*/
-    _net = net;
-    _n_shader = 4;
     _CreateBuffer();
     //_CreateNodeMap(_n_shader, _traffic_manager->_nodes, _icnt_config->GetInt("use_map"));
-    InitializeRoutingMap(*_icnt_config);
+    //InitializeRoutingMap(*_icnt_config);
 }
 
 Interface::~Interface() {
@@ -158,7 +148,7 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
     if (_subnets == 1) {
         subnet = 0;
     }
-    _traffic_manager->_GeneratePacket( input_icntID, n_flits, 0, _traffic_manager->_time, subnet, packet_type, data, output_icntID);
+    //_traffic_manager->_GeneratePacket( input_icntID, n_flits, 0, _traffic_manager->_time, subnet, packet_type, data, output_icntID);
 }
 
 void* Interface::pop(unsigned deviceID) {
@@ -247,7 +237,7 @@ bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
       WRITE_REQUEST = 2,
       WRITE_REPLY   = 3,
       ANY_TYPE      = 4
-      */
+
     bool has_buffer = false;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     //int icntID = _node_map.find(deviceID)->second;
@@ -255,7 +245,7 @@ bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
     has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
     if ((_subnets > 1))
         has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
-    return has_buffer;
+    return has_buffer;*/
 }
 
 void* Interface::_BoundaryBufferItem::PopPacket()
