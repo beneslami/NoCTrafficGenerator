@@ -140,6 +140,7 @@ int Interface::Step() {
                 else{
                     _res.source = -1;
                     _res.dest = -1;  /* source and destination -1 means no packet to eject */
+                    _res.remainingRequests = 0;
                 }
                 *_channel << _res;
                 break;
