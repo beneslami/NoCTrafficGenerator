@@ -62,6 +62,7 @@
 
  /* the current traffic manager instance */
 TrafficManager * _traffic_manager = NULL;
+Interface* _interface = NULL;
 
 int GetSimTime() {
   return trafficManager->getTime();

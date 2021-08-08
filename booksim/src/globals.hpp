@@ -32,6 +32,8 @@
 #include <iostream>
 
 /*all declared in main.cpp*/
+class Interface;
+extern Interface* _interface;
 int GetSimTime();
 
 class Stats;
