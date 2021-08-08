@@ -7,7 +7,7 @@
 #include "globals.hpp"
 #include <stddef.h>
 
-Interface::interface_result = NULL;
+Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
     if(interface_result == NULL){
         interface_result = new Interface(config, net);
