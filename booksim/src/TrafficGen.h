@@ -34,10 +34,12 @@ protected:
     vector<vector<vector<list<Flit *> > > > _input_queue;
     int  _flit_width;
     int _ideal_interconnect;
+    static TrafficGen* result;
 public:
     TrafficGen(const Configuration &, const vector<Network *> &);
     virtual ~TrafficGen();
     void Init();
+    static TrafficGen* get_instance(const Configuration &, const vector<Network *> &);
     int get_size(unsigned, unsigned, unsigned);
     bool is_empty(unsigned, unsigned, unsigned);
     friend class Interface;

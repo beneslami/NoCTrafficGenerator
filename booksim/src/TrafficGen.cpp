@@ -5,6 +5,18 @@
 #include "TrafficGen.h"
 #include "random_utils.hpp"
 
+TrafficGen* TrafficGen::result = NULL;
+
+TrafficGen* TrafficGen::get_instance(const Configuration &config, const vector<Network *> &net) {
+    if(result){
+        return result;
+    }
+    else{
+        result = TrafficGen(config, net);
+        return result;
+    }
+}
+
 TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net) {
     _nodes = _net[0]->NumNodes();
     _routers = _net[0]->NumRouters();

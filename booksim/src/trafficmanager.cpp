@@ -43,6 +43,7 @@
 #include "TrafficGen.h"
 #include "interface.h"
 
+Interface *_interface = NULL;
 TrafficManager * TrafficManager::New(Configuration const & config, vector<Network *> const & net)
 {
     TrafficManager* result = NULL;
@@ -52,8 +53,10 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
     } else if (sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
-        result = new TrafficGen(config, net);
-        std::cout << "address2: " << result << std::end;
+        result = new TrafficGen::get_instance(config, net);
+        _interface = Interface::get_instance(config, net);
+        std::cout << "TGEN address2: " << result << std::endl;
+        std::cout << "INTE address2: " << _interface << std::endl;
     }
     else
         cerr << "Unknown simulation type: " << sim_type << endl;

@@ -260,7 +260,6 @@ protected:
 
   // ============ Internal methods ============ 
 protected:
-
   virtual void _RetireFlit( Flit *f, int dest );
 
   void _Inject();
