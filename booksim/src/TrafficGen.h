@@ -5,6 +5,7 @@
 #ifndef TRAFFICGEN_H
 #define TRAFFICGEN_H
 
+#include <list>
 #include <cmath>
 #include <limits>
 #include <vector>
