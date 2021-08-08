@@ -26,6 +26,11 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
     _flit_size = _icnt_config->GetInt("flit_width");
+    if (_icnt_config->GetInt("input_buffer_size")) {
+        _input_buffer_capacity = _icnt_config->GetInt("input_buffer_size");
+    } else {
+        _input_buffer_capacity = 9;
+    }
     vector<int> mapping = _icnt_config->GetIntArray("mapping");
     for(int i = 0; i < mapping.size(); i++) {
         _node_map[i] = mapping[i];
@@ -230,12 +235,19 @@ bool Interface::Busy() const {
 
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
+    /*
+      READ_REQUEST  = 0,
+      READ_REPLY    = 1,
+      WRITE_REQUEST = 2,
+      WRITE_REPLY   = 3,
+      ANY_TYPE      = 4
+      */
     bool has_buffer = false;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
     int icntID = _node_map.find(deviceID)->second;
-    has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
-    if ((_subnets > 1) && deviceID >= _n_shader && deviceID < _n_shader)
-        has_buffer = _traffic_manager->_input_queue[1][icntID][0].size() +n_flits <= _input_buffer_capacity;
+    has_buffer = (_traffic_manager->_input_queue[0][icntID][0].size() + n_flits <= _input_buffer_capacity);
+    if ((_subnets > 1))
+        has_buffer = (_traffic_manager->_input_queue[1][icntID][0].size() +n_flits <= _input_buffer_capacity);
     return has_buffer;
 }
 
