@@ -21,15 +21,20 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _icnt_config = new IntersimConfig();
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
+    if (_icnt_config->GetInt("ejection_buffer_size")) {
+        _ejection_buffer_capacity = _icnt_config->GetInt( "ejection_buffer_size" ) ;
+    } else {
+        _ejection_buffer_capacity = _icnt_config->GetInt( "vc_buf_size" );
+    }
+
+    _boundary_buffer_capacity = _icnt_config->GetInt( "boundary_buffer_size" ) ;
+    assert(_boundary_buffer_capacity);
     if (_icnt_config->GetInt("input_buffer_size")) {
         _input_buffer_capacity = _icnt_config->GetInt("input_buffer_size");
     } else {
         _input_buffer_capacity = 9;
     }
     Init();
-    //_CreateBuffer();
-    //_CreateNodeMap(_n_shader, _traffic_manager->_nodes, _icnt_config->GetInt("use_map"));
-    //InitializeRoutingMap(*_icnt_config);
 }
 
 Interface::~Interface() {
