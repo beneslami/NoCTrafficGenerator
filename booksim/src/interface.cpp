@@ -102,7 +102,7 @@ int Interface::Step() {
             case STEP_REQ: {
                 StepResMsg step;
                 *_channel << step;
-                //process_more = false;
+                process_more = false;
                 break;
             }
             case INJECT_REQ: {

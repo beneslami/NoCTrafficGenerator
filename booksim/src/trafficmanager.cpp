@@ -41,6 +41,9 @@
 #include "random_utils.hpp" 
 #include "vc.hpp"
 #include "packet_reply_info.hpp"
+#include "interface.h"
+
+extern Interface *g_icnt_interface;
 
 TrafficManager * TrafficManager::New(Configuration const & config,
                                      vector<Network *> const & net)
@@ -1261,6 +1264,7 @@ void TrafficManager::_Step( )
     flits[subnet].clear();
     _net[subnet]->Evaluate( );
     _net[subnet]->WriteOutputs( );
+    g_icnt_interface->Step();
   }
   
   ++_time;
