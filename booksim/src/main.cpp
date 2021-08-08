@@ -51,9 +51,10 @@
 #include "trafficmanager.hpp"
 #include "random_utils.hpp"
 #include "network.hpp"
+#include "globals.hpp"
 #include "injection.hpp"
 #include "power_module.hpp"
-
+#include "interface.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,6 +63,7 @@
 
  /* the current traffic manager instance */
 TrafficManager * trafficManager = NULL;
+Interface *g_icnt_interface;
 
 int GetSimTime() {
   return trafficManager->getTime();
