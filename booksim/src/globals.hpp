@@ -40,9 +40,6 @@ int GetSimTime();
 class Stats;
 Stats * GetStats(const std::string & name);
 
-class InterconnectInterface;
-extern InterconnectInterface *g_icnt_interface;
-
 extern bool gPrintActivity;
 
 extern int gK;
