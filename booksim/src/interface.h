@@ -52,6 +52,7 @@ public:
     bool Busy()const;
     bool HasBuffer(unsigned, unsigned int) const;
     void _CreateBuffer();
+    void _CreateNodeMap(unsigned , unsigned , int);
 protected:
     static Interface* interface_result;
     class _BoundaryBufferItem {
@@ -63,7 +64,6 @@ protected:
         void* TopPacket() const;
         void PushFlitData(void* data,bool is_tail);
         bool empty(){ return _packet_n == 0 ? true : false; }
-
     private:
         queue<void *> _buffer;
         queue<bool> _tail_flag;
