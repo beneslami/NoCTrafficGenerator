@@ -37,7 +37,7 @@
 #include "booksim_config.hpp"
 #include "trafficmanager.hpp"
 #include "batchtrafficmanager.hpp"
-#include "gputrafficmanager.hpp"
+#include "MCMGPUTrafficManager.h"
 #include "random_utils.hpp" 
 #include "vc.hpp"
 #include "packet_reply_info.hpp"
