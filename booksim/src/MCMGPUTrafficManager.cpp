@@ -4,7 +4,7 @@
 
 #include "MCMGPUTrafficManager.h"
 
-MCMGPUTrafficManager::MCMGPUTrafficManager(const Configuration &config, const int &net) : TrafficManager(config, net){
+MCMGPUTrafficManager::MCMGPUTrafficManager(const Configuration &config, const <Network*> &net) : TrafficManager(config, net){
     _input_queue.resize(_subnets);
     for ( int subnet = 0; subnet < _subnets; ++subnet) {
         _input_queue[subnet].resize(_nodes);

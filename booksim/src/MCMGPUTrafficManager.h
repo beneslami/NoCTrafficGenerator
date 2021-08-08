@@ -11,6 +11,7 @@
 #include "config_utils.hpp"
 #include "booksim_config.hpp"
 #include "trafficmanager.hpp"
+#include "networks/network.hpp"
 
 class MCMGPUTrafficManager : public TrafficManager{
 protected:
