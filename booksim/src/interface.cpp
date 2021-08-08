@@ -2,7 +2,6 @@
 // Created by Ben on 7/19/21.
 //
 #include "interface.h"
-#include "IntersimConfig.h"
 #include "routefunc.hpp"
 #include "config_utils.hpp"
 #include "TrafficGen.h"

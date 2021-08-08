@@ -11,6 +11,7 @@
 #include "module.hpp"
 #include "globals.hpp"
 #include "config_utils.hpp"
+#include "intersim_config.hpp"
 #include "netstream/messages.h"
 #include "networks/network.hpp"
 #include "netstream/socketstream.h"
