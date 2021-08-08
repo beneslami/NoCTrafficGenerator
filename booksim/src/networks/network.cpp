@@ -1,7 +1,7 @@
-// $Id$
+// $Id: network.cpp 5188 2012-08-30 00:31:31Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -79,49 +79,49 @@ Network::~Network( )
 
 Network * Network::New(const Configuration & config, const string & name)
 {
-  const string topo = config.GetStr( "topology" );
-  Network * n = NULL;
-  if ( topo == "torus" ) {
-    KNCube::RegisterRoutingFunctions() ;
-    n = new KNCube( config, name, false );
-  } else if ( topo == "mesh" ) {
-    KNCube::RegisterRoutingFunctions() ;
-    n = new KNCube( config, name, true );
-  } else if ( topo == "cmesh" ) {
-    CMesh::RegisterRoutingFunctions() ;
-    n = new CMesh( config, name );
-  } else if ( topo == "fly" ) {
-    KNFly::RegisterRoutingFunctions() ;
-    n = new KNFly( config, name );
-  } else if ( topo == "qtree" ) {
-    QTree::RegisterRoutingFunctions() ;
-    n = new QTree( config, name );
-  } else if ( topo == "tree4" ) {
-    Tree4::RegisterRoutingFunctions() ;
-    n = new Tree4( config, name );
-  } else if ( topo == "fattree" ) {
-    FatTree::RegisterRoutingFunctions() ;
-    n = new FatTree( config, name );
-  } else if ( topo == "flatfly" ) {
-    FlatFlyOnChip::RegisterRoutingFunctions() ;
-    n = new FlatFlyOnChip( config, name );
-  } else if ( topo == "anynet"){
-    AnyNet::RegisterRoutingFunctions() ;
-    n = new AnyNet(config, name);
-  } else if ( topo == "dragonflynew"){
-    DragonFlyNew::RegisterRoutingFunctions() ;
-    n = new DragonFlyNew(config, name);
-  } else {
-    cerr << "Unknown topology: " << topo << endl;
-  }
-  
-  /*legacy code that insert random faults in the networks
-   *not sure how to use this
-   */
-  if ( n && ( config.GetInt( "link_failures" ) > 0 ) ) {
-    n->InsertRandomFaults( config );
-  }
-  return n;
+    const string topo = config.GetStr("topology");
+    Network *n = NULL;
+    if (topo == "torus") {
+        KNCube::RegisterRoutingFunctions();
+        n = new KNCube(config, name, false);
+    } else if (topo == "mesh") {
+        KNCube::RegisterRoutingFunctions();
+        n = new KNCube(config, name, true);
+    } else if (topo == "cmesh") {
+        CMesh::RegisterRoutingFunctions();
+        n = new CMesh(config, name);
+    } else if (topo == "fly") {
+        KNFly::RegisterRoutingFunctions();
+        n = new KNFly(config, name);
+    } else if (topo == "qtree") {
+        QTree::RegisterRoutingFunctions();
+        n = new QTree(config, name);
+    } else if (topo == "tree4") {
+        Tree4::RegisterRoutingFunctions();
+        n = new Tree4(config, name);
+    } else if (topo == "fattree") {
+        FatTree::RegisterRoutingFunctions();
+        n = new FatTree(config, name);
+    } else if (topo == "flatfly") {
+        FlatFlyOnChip::RegisterRoutingFunctions();
+        n = new FlatFlyOnChip(config, name);
+    } else if (topo == "anynet") {
+        AnyNet::RegisterRoutingFunctions();
+        n = new AnyNet(config, name);
+    } else if (topo == "dragonflynew") {
+        DragonFlyNew::RegisterRoutingFunctions();
+        n = new DragonFlyNew(config, name);
+    } else {
+        cerr << "Unknown topology: " << topo << endl;
+    }
+
+    /*legacy code that insert random faults in the networks
+     *not sure how to use this
+     */
+    if (n && (config.GetInt("link_failures") > 0)) {
+        n->InsertRandomFaults(config);
+    }
+    return n;
 }
 
 void Network::_Alloc( )

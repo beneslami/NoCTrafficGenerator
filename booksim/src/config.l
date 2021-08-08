@@ -1,9 +1,4 @@
-%option noinput
-%option nounput
-
 %{
-
-#include <string.h>
 
 #include "y.tab.h"
 

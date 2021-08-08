@@ -1,7 +1,7 @@
-// $Id$
+// $Id: iq_router.cpp 5263 2012-09-20 23:40:33Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -225,6 +225,7 @@ void IQRouter::ReadInputs( )
 
 void IQRouter::_InternalStep( )
 {
+
   if(!_active) {
     return;
   }
@@ -280,6 +281,7 @@ void IQRouter::_InternalStep( )
 
   _bufferMonitor->cycle( );
   _switchMonitor->cycle( );
+
 }
 
 void IQRouter::WriteOutputs( )
@@ -550,6 +552,8 @@ void IQRouter::_RouteUpdate( )
 // VC allocation
 //------------------------------------------------------------------------------
 
+extern int kain_one_flit_contention_stall;
+extern int kain_one_flit_count;
 void IQRouter::_VCAllocEvaluate( )
 {
   assert(_vc_allocator);
@@ -658,9 +662,25 @@ void IQRouter::_VCAllocEvaluate( )
 	    }
 	    *gWatchOut << "." << endl;
 	  }
+
+      if(FullName().find("network_1") != FullName().npos)
+      {
+            kain_one_flit_contention_stall += 1;
+            kain_one_flit_count += 1;
+      } 
+
+
 	} else {
 	  elig = true;
 	  if(_vc_busy_when_full && dest_buf->IsFullFor(out_vc)) {
+
+
+      if(FullName().find("network_1") != FullName().npos)
+      {
+            kain_one_flit_contention_stall += 1;
+            kain_one_flit_count += 1;
+      }
+
 	    if(f->watch)
 	      *gWatchOut << GetSimTime() << " | " << FullName() << " | "
 			 << "  VC " << out_vc 
@@ -1044,7 +1064,7 @@ void IQRouter::_SWHoldUpdate( )
     
     int const expanded_output = item.second.second;
     
-    if(expanded_output >= 0 && ( _output_buffer_size==-1 || _output_buffer[expanded_output/_output_speedup].size()<size_t(_output_buffer_size))) {
+    if(expanded_output >= 0 && ( _output_buffer_size==-1 || _output_buffer[expanded_output].size()<size_t(_output_buffer_size))) {
       
       assert(_switch_hold_in[expanded_input] == expanded_output);
       assert(_switch_hold_out[expanded_output] == expanded_input);
@@ -1193,7 +1213,7 @@ void IQRouter::_SWHoldUpdate( )
     } else {
       //when internal speedup >1.0, the buffer stall stats may not be accruate
       assert((expanded_output == STALL_BUFFER_FULL) ||
-	     (expanded_output == STALL_BUFFER_RESERVED) || !( _output_buffer_size==-1 || _output_buffer[expanded_output/_output_speedup].size()<size_t(_output_buffer_size)));
+	     (expanded_output == STALL_BUFFER_RESERVED) || !( _output_buffer_size==-1 || _output_buffer[expanded_output].size()<size_t(_output_buffer_size)));
 
       int const held_expanded_output = _switch_hold_in[expanded_input];
       assert(held_expanded_output >= 0);
@@ -2162,8 +2182,18 @@ void IQRouter::_SwitchEvaluate( )
   }
 }
 
+
+extern int kain_request_flit;
+extern int kain_reply_flit;
+extern int kain_traverse_max_flit_reply;
+extern int kain_traverse_max_flit_request;
+int KAIN_receive_reply_network[384];
+
 void IQRouter::_SwitchUpdate( )
 {
+  int kain_traverse_flit_tmp = 0;
+  int kain_subnetwork;
+
   while(!_crossbar_flits.empty()) {
 
     pair<int, pair<Flit *, pair<int, int> > > const & item = _crossbar_flits.front();
@@ -2193,6 +2223,18 @@ void IQRouter::_SwitchUpdate( )
 		 << "." << (expanded_output % _output_speedup)
 		 << "." << endl;
     }
+
+    if(f->subnetwork == 0)
+        kain_request_flit++;
+
+    if(f->subnetwork == 1)//reply network
+        kain_reply_flit++;
+
+
+    kain_subnetwork = f->subnetwork;
+    kain_traverse_flit_tmp++;
+
+
     _switchMonitor->traversal(input, output, f) ;
 
     if(f->watch) {
@@ -2201,12 +2243,32 @@ void IQRouter::_SwitchUpdate( )
 		 << " at output " << output
 		 << "." << endl;
     }
+
+    if(FullName().find("network_1") != FullName().npos)
+    {    
+        assert(output < 384); 
+        KAIN_receive_reply_network[output] = 1; 
+    }
+
     _output_buffer[output].push(f);
     //the output buffer size isn't precise due to flits in flight
     //but there is a maximum bound based on output speed up and ST traversal
     assert(_output_buffer[output].size()<=(size_t)_output_buffer_size+ _crossbar_delay* _output_speedup+( _output_speedup-1) ||_output_buffer_size==-1);
     _crossbar_flits.pop_front();
   }
+
+
+  if(kain_subnetwork == 0)
+  {
+      if(kain_traverse_flit_tmp > kain_traverse_max_flit_request) 
+            kain_traverse_max_flit_request = kain_traverse_flit_tmp;
+  }
+  if(kain_subnetwork == 1)
+  {
+      if(kain_traverse_flit_tmp > kain_traverse_max_flit_reply) 
+            kain_traverse_max_flit_reply = kain_traverse_flit_tmp;
+  }
+
 }
 
 
@@ -2235,7 +2297,6 @@ void IQRouter::_OutputQueuing( )
 //------------------------------------------------------------------------------
 // write outputs
 //------------------------------------------------------------------------------
-
 void IQRouter::_SendFlits( )
 {
   for ( int output = 0; output < _outputs; ++output ) {
@@ -2248,6 +2309,7 @@ void IQRouter::_SendFlits( )
       ++_sent_flits[f->cl][output];
 #endif
 
+
       if(f->watch)
 	*gWatchOut << GetSimTime() << " | " << FullName() << " | "
 		    << "Sending flit " << f->id
@@ -2259,6 +2321,7 @@ void IQRouter::_SendFlits( )
       _output_channels[output]->Send( f );
     }
   }
+  
 }
 
 void IQRouter::_SendCredits( )

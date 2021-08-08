@@ -57,6 +57,15 @@ int Interface::Init() {
     return 0;
 }
 
+int Interface::GetIcntTime() const {
+    return _traffic_manager->getTime();
+}
+
+Stats* Interface::GetIcntStats(const string &name) const {
+    return _traffic_manager->getStats(name);
+}
+
+
 /*
 void Interface::_CreateBuffer() {
     unsigned nodes = _n_shader;

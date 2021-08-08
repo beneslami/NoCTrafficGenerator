@@ -54,6 +54,8 @@ public:
     bool HasBuffer(unsigned, unsigned int) const;
     void _CreateBuffer();
     void _CreateNodeMap(unsigned , unsigned , int);
+    int GetIcntTime() const;
+    Stats* GetIcntStats(const string & name) const;
 protected:
     static Interface* interface_result;
     class _BoundaryBufferItem {

@@ -1,7 +1,7 @@
-// $Id$
+// $Id: trafficmanager.hpp 5365 2012-11-25 02:09:59Z qtedq $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,7 @@ protected:
   int _nodes;
   int _routers;
   int _vcs;
+
   vector<Network *> _net;
   vector<vector<Router *> > _router;
 
@@ -260,6 +261,7 @@ protected:
 
   // ============ Internal methods ============ 
 protected:
+
   virtual void _RetireFlit( Flit *f, int dest );
 
   void _Inject();

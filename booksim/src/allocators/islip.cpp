@@ -1,7 +1,7 @@
-// $Id$
+// $Id: islip.cpp 5188 2012-08-30 00:31:31Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,22 @@ void iSLIP_Sparse::Allocate( )
 
   map<int, sRequest>::iterator p;
   bool wrapped;
+
+
+  extern int kain_one_flit_contention_stall;
+  extern int kain_one_flit_count;
+  extern bool kain_flit_use;
+  if(FullName().find("network_1") != FullName().npos)
+    for(int i = 0; i < _outputs; i++)
+    {   
+            if (_out_req[i].size() != 0)  
+                kain_flit_use = true;
+    
+            kain_one_flit_contention_stall += _out_req[i].size();
+
+            kain_one_flit_count += _out_req[i].size();
+    }   
+
 
   for ( int iter = 0; iter < _iSLIP_iter; ++iter ) {
     // Grant phase
@@ -166,6 +182,15 @@ void iSLIP_Sparse::Allocate( )
       } 
     }
   }
+
+  if(FullName().find("network_1") != FullName().npos)
+  {
+    for ( int j = 0; j < _outputs; ++j ) {
+        if(_outmatch[j] != -1)
+            kain_one_flit_contention_stall--;
+    }
+  }
+
 
 #ifdef DEBUG_ISLIP
   cout << "input match: ";

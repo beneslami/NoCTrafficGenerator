@@ -1,7 +1,7 @@
-// $Id$
+// $Id: qtree.cpp 5188 2012-08-30 00:31:31Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 // RCS Information:
 //  $Author: jbalfour $
 //  $Date: 2007/05/17 17:14:07 $
-//  $Id$
+//  $Id: qtree.cpp 5188 2012-08-30 00:31:31Z dub $
 // 
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,27 +82,31 @@ void QTree::RegisterRoutingFunctions(){
 
 void QTree::_BuildNet( const Configuration& config )
 {
-  for (int h = 0; h < _n; h++) {
-    for (int pos = 0 ; pos < powi( _k, h ) ; ++pos ) {
+
+  ostringstream routerName;
+  int h, r, pos, port;
+
+  for (h = 0; h < _n; h++) {
+    for (pos = 0 ; pos < powi( _k, h ) ; ++pos ) {
       
       int id = h * 256 + pos;  
-      int r = _RouterIndex( h, pos );
+      r = _RouterIndex( h, pos );
 
-      ostringstream routerName("router_");
-      routerName << h << "_" << pos;
+      routerName << "router_" << h << "_" << pos;
 
       int d = ( h == 0 ) ? _k : _k + 1;
       _routers[r] = Router::NewRouter( config, this,
 				       routerName.str( ),
 				       id, d, d);
       _timed_modules.push_back(_routers[r]);
+      routerName.str("");
     }
   }
   
   // Injection & Ejection Channels
-  for ( int pos = 0 ; pos < powi( _k, _n-1 ) ; ++pos ) {
-    int r = _RouterIndex( _n-1, pos );
-    for ( int port = 0 ; port < _k ; port++ ) {
+  for ( pos = 0 ; pos < powi( _k, _n-1 ) ; ++pos ) {
+    r = _RouterIndex( _n-1, pos );
+    for ( port = 0 ; port < _k ; port++ ) {
 
       _routers[r]->AddInputChannel( _inject[_k*pos+port],
 				    _inject_cred[_k*pos+port]);
@@ -112,14 +116,12 @@ void QTree::_BuildNet( const Configuration& config )
     }
   }
 
-  for ( int h = 0 ; h < _n ; ++h ) {
-    for ( int pos = 0 ; pos < powi( _k, h ) ; ++pos ) {
+  int c;
+  for ( h = 0 ; h < _n ; ++h ) {
+    for ( pos = 0 ; pos < powi( _k, h ) ; ++pos ) {
+      for ( port = 0 ; port < _k ; port++ ) {
 
-      int r = _RouterIndex( h, pos );
-
-      int c;
-
-      for ( int port = 0 ; port < _k ; port++ ) {
+	r = _RouterIndex( h, pos );
 
 	if ( h < _n-1 ) {
 	  // Channels to Children Nodes

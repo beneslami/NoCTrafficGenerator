@@ -1,7 +1,7 @@
-// $Id$
+// $Id: tree4.cpp 5188 2012-08-30 00:31:31Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 // RCS Information:
 //  $Author: jbalfour $
 //  $Date: 2007/06/26 22:49:23 $
-//  $Id$
+//  $Id: tree4.cpp 5188 2012-08-30 00:31:31Z dub $
 // 
 ////////////////////////////////////////////////////////////////////////
 
@@ -227,7 +227,7 @@ int Tree4::_WireLatency( int height1, int pos1, int height2, int pos2 )
 {
   int heightChild, heightParent, posChild, posParent;
 
-  int L = -1;
+  int L;
 
   if (height1 < height2) {
     heightChild  = height2;
@@ -285,6 +285,5 @@ int Tree4::_WireLatency( int height1, int pos1, int height2, int pos2 )
       case 3: L =_length_d1_d0_0; break;
       }
   }
-  assert(L != -1);
   return L;
 }

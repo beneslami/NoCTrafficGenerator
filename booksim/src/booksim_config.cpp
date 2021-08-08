@@ -1,7 +1,7 @@
-// $Id$
+// $Id: booksim_config.cpp 5506 2013-05-07 21:22:23Z qtedq $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -36,20 +36,7 @@
 #include "booksim_config.hpp"
 
 BookSimConfig::BookSimConfig( )
-{
-
-  //===============================
-  //  MCM_GPU options
-  //===============================
-  _int_map["mcm_gpu_concentrate"] = 0;
-  _int_map["flit_width"] = 32;
-  _int_map["ideal_interconnect"] = 0;
-  AddStrField("mapping", "{0, 0, 1, 1, 2, 2, 3, 3}");
-  AddStrField("_host", "127.0.0.1"); // for connecting FeS2
-  _int_map["_port"] = 20211;
-  _int_map["input_buffer_size"] = 122880; // 128/flit_size*INTER_ICNT_CTRL
-  _int_map["ejection_buffer_size"] = 122880;
-  _int_map["boundary_buffer_size"] = 122880;
+{ 
   //========================================================
   // Network options
   //========================================================
@@ -58,7 +45,7 @@ BookSimConfig::BookSimConfig( )
   AddStrField( "channel_file", "" ) ;
 
   // Physical sub-networks
-  _int_map["subnets"] = 2;
+  _int_map["subnets"] = 1;
 
   //==== Topology options =======================
   AddStrField( "topology", "torus" );
@@ -80,7 +67,6 @@ BookSimConfig::BookSimConfig( )
 
   _int_map["link_failures"] = 0; //legacy
   _int_map["fail_seed"]     = 0; //legacy
-  AddStrField( "fail_seed", "" ); // workaround to allow special "time" value
 
   //==== Single-node options ===============================
 
@@ -173,8 +159,7 @@ BookSimConfig::BookSimConfig( )
   _int_map["class_priority"] = 0;
   AddStrField("class_priority", ""); // workaraound to allow for vector specification
 
-  _int_map["perm_seed"] = 0; // seed value for random permuation trafficpattern generator
-  AddStrField("perm_seed", ""); // workaround to allow special "time" value
+  _int_map["perm_seed"] = 0;         // seed value for random permuation trafficpattern generator
 
   _float_map["injection_rate"]       = 0.1;
   AddStrField("injection_rate", ""); // workaraound to allow for vector specification
@@ -239,7 +224,7 @@ BookSimConfig::BookSimConfig( )
   //   latency    - average + latency distribution for a particular injection rate
   //   throughput - sustained throughput for a particular injection rate
 
-  AddStrField( "sim_type", "mcm_gpu" );
+  AddStrField( "sim_type", "latency" );
 
   _int_map["warmup_periods"] = 3; // number of samples periods to "warm-up" the simulation
 
@@ -279,13 +264,12 @@ BookSimConfig::BookSimConfig( )
   //_int_map["split_packets"]   = 0;  // know what you're doing
 
   _int_map["seed"]            = 0; //random seed for simulation, e.g. traffic 
-  AddStrField("seed", ""); // workaround to allow special "time" value
 
   _int_map["print_activity"] = 0;
 
   _int_map["print_csv_results"] = 0;
 
-  _int_map["deadlock_warn_timeout"] = 256;
+  _int_map["deadlock_warn_timeout"] = 16384; // jasonjk increased from 256 to 16384
 
   _int_map["viewer_trace"] = 0;
 

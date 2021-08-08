@@ -1,7 +1,7 @@
-// $Id$
+// $Id: traffic.cpp 5188 2012-08-30 00:31:31Z dub $
 
 /*
- Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+ Copyright (c) 2007-2012, Trustees of The Leland Stanford Junior University
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <ctime>
 #include "random_utils.hpp"
 #include "traffic.hpp"
 
@@ -77,12 +76,7 @@ TrafficPattern * TrafficPattern::New(string const & pattern, int nodes,
     int perm_seed = -1;
     if(params.empty()) {
       if(config) {
-	if(config->GetStr("perm_seed") == "time") {
-	  perm_seed = int(time(NULL));
-	  cout << "SEED: perm_seed=" << perm_seed << endl;
-	} else {
-	  perm_seed = config->GetInt("perm_seed");
-	}
+	perm_seed = config->GetInt("perm_seed");
       } else {
 	cout << "Error: Missing parameter for random permutation traffic pattern: " << pattern << endl;
 	exit(-1);
@@ -338,9 +332,7 @@ RandomPermutationTrafficPattern::RandomPermutationTrafficPattern(int nodes,
 
 void RandomPermutationTrafficPattern::randomize(int seed)
 {
-  vector<long> save_x;
-  vector<double> save_u;
-  SaveRandomState(save_x, save_u);
+  unsigned long prev_seed = RandomIntLong( );
   RandomSeed(seed);
 
   _dest.assign(_nodes, -1);
@@ -361,7 +353,7 @@ void RandomPermutationTrafficPattern::randomize(int seed)
     _dest[j] = i;
   }
 
-  RestoreRandomState(save_x, save_u); 
+  RandomSeed(prev_seed); 
 }
 
 int RandomPermutationTrafficPattern::dest(int source)
@@ -498,7 +490,7 @@ HotSpotTrafficPattern::HotSpotTrafficPattern(int nodes, vector<int> hotspots,
     int const hotspot = _hotspots[i];
     assert((hotspot >= 0) && (hotspot < _nodes));
     int const rate = _rates[i];
-    assert(rate > 0);
+    assert(rate >= 0);
     _max_val += rate;
   }
 }
