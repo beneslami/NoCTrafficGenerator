@@ -43,7 +43,6 @@
 #include "TrafficGen.h"
 #include "interface.h"
 
-Interface *_interface = NULL;
 TrafficManager * TrafficManager::New(Configuration const & config, vector<Network *> const & net)
 {
     TrafficManager* result = NULL;
