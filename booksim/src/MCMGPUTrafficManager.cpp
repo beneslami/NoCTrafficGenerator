@@ -12,7 +12,6 @@ MCMGPUTrafficManager::MCMGPUTrafficManager(const Configuration &config, const ve
             _input_queue[subnet][node].resize(_classes);
         }
     }
-    std::cout << "size: " << _input_queue.size() << std::endl;
 }
 
 MCMGPUTrafficManager::~MCMGPUTrafficManager(){

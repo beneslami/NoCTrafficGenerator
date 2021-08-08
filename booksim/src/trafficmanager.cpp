@@ -1597,7 +1597,7 @@ bool TrafficManager::_SingleSim( )
             break;
           }
           
-          _DisplayRemaining( );
+          //_DisplayRemaining( );
           
         }
       }
@@ -1664,7 +1664,7 @@ bool TrafficManager::Run( )
       ++empty_steps;
       
       if ( empty_steps % 1000 == 0 ) {
-        _DisplayRemaining( );
+        //_DisplayRemaining( );
       }
       
       packets_left = false;
@@ -1688,9 +1688,9 @@ bool TrafficManager::Run( )
     _UpdateOverallStats();
   }
   
-  DisplayOverallStats();
+  //DisplayOverallStats();
   if(_print_csv_results) {
-    DisplayOverallStatsCSV();
+    //DisplayOverallStatsCSV();
   }
   
   return true;
