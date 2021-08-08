@@ -5,6 +5,7 @@
 #ifndef MCMGPUTRAFFICMANAGER_H
 #define MCMGPUTRAFFICMANAGER_H
 
+#include <vector>
 #include "flit.hpp"
 #include "stats.hpp"
 #include "booksim.hpp"
