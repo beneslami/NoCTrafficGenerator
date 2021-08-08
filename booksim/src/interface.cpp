@@ -56,11 +56,13 @@ int Interface::Init() {
 }
 
 int Interface::GetIcntTime() const {
-    return _traffic_manager->getTime();
+    //return _traffic_manager->getTime();
+    return 0;
 }
 
 Stats* Interface::GetIcntStats(const string &name) const {
-    return _traffic_manager->getStats(name);
+    //return _traffic_manager->getStats(name);
+    return 0;
 }
 
 
