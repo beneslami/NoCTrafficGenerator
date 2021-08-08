@@ -126,6 +126,7 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
+                Flit* f = NULL;
                 //Flit* f = (Flit*)(pop(ejReq->size));
                 EjectResMsg _res;
                 if(f) {
