@@ -52,8 +52,7 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
     } else if (sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
-        //result = TrafficGen::get_instance(config, net);
-        result = new TrafficManager(config, net);
+        result = TrafficGen::get_instance(config, net);
         _interface = Interface::get_instance(config, net);
     }
     else

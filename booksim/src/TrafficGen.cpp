@@ -486,6 +486,7 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
     _slowest_packet.resize(_classes, -1);
     _interface = Interface::get_instance(config, net);
     _interface->Init();
+     */
     _input_queue.resize(_subnets);
     for ( int subnet = 0; subnet < _subnets; ++subnet) {
         _input_queue[subnet].resize(_nodes);
@@ -493,5 +494,5 @@ TrafficGen::TrafficGen(const Configuration &config, const vector<Network *> &net
             _input_queue[subnet][node].resize(_classes);
         }
     }
-     */
+
 }
