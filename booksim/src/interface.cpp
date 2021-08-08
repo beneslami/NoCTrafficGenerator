@@ -93,7 +93,7 @@ int Interface::Step() {
             }
             case INJECT_REQ: {
                 InjectReqMsg *req = (InjectReqMsg *) msg;
-                push(req->source, req->dest, (void *) req, req->size, req->msgType);
+                //push(req->source, req->dest, (void *) req, req->size, req->msgType);
                 InjectResMsg res;
                 res.type = ACKNOWLEDGE;
                 *_channel << res;
@@ -101,7 +101,7 @@ int Interface::Step() {
             }
             case INJECT_RES: {
                 InjectResMsg *resInject = (InjectResMsg *) msg;
-                push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
+                //push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
                 InjectResMsg resAck;
                 resAck.type = ACKNOWLEDGE;
                 *_channel << resAck;
@@ -109,7 +109,7 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
-                Flit* f = (Flit*)(pop(ejReq->size));
+                //Flit* f = (Flit*)(pop(ejReq->size));
                 EjectResMsg _res;
                 _res.source = f->src;
                 _res.dest = f->dest;
