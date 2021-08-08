@@ -979,10 +979,10 @@ void TrafficManager::_Step( )
                                << " from VC " << f->vc
                                << "." << endl;
                 }
-                _interface_->WriteOutBuffer(subnet, n, f);  //Added by Me
+                _interface->WriteOutBuffer(subnet, n, f);  //Added by Me
             }
-            _interface_->Transfer2BoundaryBuffer(subnet, n);   // Added by me: Start
-            Flit *const ejected_flit = _interface_->GetEjectedFlit(subnet, n);
+            _interface->Transfer2BoundaryBuffer(subnet, n);   // Added by me: Start
+            Flit *const ejected_flit = _interface->GetEjectedFlit(subnet, n);
             std::cout << _sample_period << std::endl;
             if (ejected_flit) {
                 if (ejected_flit->head)
