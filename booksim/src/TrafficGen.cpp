@@ -12,7 +12,7 @@ TrafficGen* TrafficGen::get_instance(const Configuration &config, const vector<N
         return result;
     }
     else{
-        result = TrafficGen(config, net);
+        result = new TrafficGen(config, net);
         return result;
     }
 }
