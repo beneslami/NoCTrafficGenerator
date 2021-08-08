@@ -23,7 +23,6 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _icnt_config = new IntersimConfig();
     _host = _icnt_config->GetStr("_host");
     _port = _icnt_config->GetInt("_port");
-    _flit_size = _icnt_config->GetInt("flit_width");
     if (_icnt_config->GetInt("input_buffer_size")) {
         _input_buffer_capacity = _icnt_config->GetInt("input_buffer_size");
     } else {
