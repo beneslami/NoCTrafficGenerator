@@ -31,14 +31,14 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
-    vector<int> mapping = _icnt_config->GetIntArray("mapping");
+    /*vector<int> mapping = _icnt_config->GetIntArray("mapping");
     for(int i = 0; i < mapping.size(); i++) {
         _node_map[i] = mapping[i];
-    }
+    }*/
     _net = net;
     _n_shader = 4;
     _CreateBuffer();
-    _CreateNodeMap(_n_shader, _traffic_manager->_nodes, _icnt_config->GetInt("use_map"));
+    //_CreateNodeMap(_n_shader, _traffic_manager->_nodes, _icnt_config->GetInt("use_map"));
     InitializeRoutingMap(*_icnt_config);
 }
 
@@ -147,8 +147,10 @@ int Interface::Step() {
 
 void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int packet_type) {
     assert(HasBuffer(input_deviceID, size));
-    int output_icntID = _node_map[output_deviceID];
-    int input_icntID = _node_map[input_deviceID];
+    //int output_icntID = _node_map[output_deviceID];
+    //int input_icntID = _node_map[input_deviceID];
+    int output_icntID = output_deviceID;
+    int input_icntID = input_deviceID;
     unsigned int n_flits = (size / _flit_size) + ((size % _flit_size)? 1:0);
     int subnet;
     if (_subnets == 1) {
@@ -158,7 +160,8 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
 }
 
 void* Interface::pop(unsigned deviceID) {
-    int icntID = _node_map[deviceID];
+    //int icntID = _node_map[deviceID];
+    int icntID = deviceID;
     void* data = NULL;
     int subnet = 0;
     int turn = _round_robin_turn[subnet][icntID];
@@ -245,7 +248,8 @@ bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
       */
     bool has_buffer = false;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
-    int icntID = _node_map.find(deviceID)->second;
+    //int icntID = _node_map.find(deviceID)->second;
+    int icntID = deviceID;
     has_buffer = (_traffic_manager->_input_queue[0][icntID][0].size() + n_flits <= _input_buffer_capacity);
     if ((_subnets > 1))
         has_buffer = (_traffic_manager->_input_queue[1][icntID][0].size() +n_flits <= _input_buffer_capacity);
@@ -290,66 +294,5 @@ void Interface::_BoundaryBufferItem::PushFlitData(void* data,bool is_tail)
     _tail_flag.push(is_tail);
     if (is_tail) {
         _packet_n++;
-    }
-}
-
-void Interface::_CreateNodeMap(unsigned n_shader, unsigned n_node, int use_map) {
-    if (use_map) {
-        map<unsigned, vector<unsigned> > preset_memory_map;
-        {
-            unsigned memory_node[] = {1, 3, 4, 6, 9, 11, 12, 14};
-            preset_memory_map[16] = vector<unsigned>(memory_node, memory_node+8);
-        }
-        {
-            unsigned memory_node[] = {3, 7, 10, 12, 23, 25, 28, 32};
-            preset_memory_map[36] = vector<unsigned>(memory_node, memory_node+8);
-        }
-        {
-            unsigned memory_node[] = {3, 15, 17, 29, 36, 47, 49, 61};
-            preset_memory_map[64] = vector<unsigned>(memory_node, memory_node+sizeof(memory_node)/sizeof(unsigned));
-        }
-        {
-            unsigned memory_node[] = {12, 20, 25, 28, 57, 60, 63, 92, 95,100,108};
-            preset_memory_map[121] = vector<unsigned>(memory_node, memory_node+sizeof(memory_node)/sizeof(unsigned));
-        }
-
-        {
-            unsigned memory_node[] = {0, 2, 4, 6, 8, 10, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 44, 46, 48, 50, 52, 54, 56, 58, 62, 64, 66, 68, 70, 72, 76, 78, 80, 82, 84, 86, 88, 90, 92, 96, 98, 100, 102, 104, 106, 110, 112, 114, 116, 118, 122, 124, 126, 128, 130, 132, 134 , 138, 140, 142};
-            preset_memory_map[144] = vector<unsigned>(memory_node, memory_node+sizeof(memory_node)/sizeof(unsigned));
-        }
-
-        const vector<unsigned> &memory_node = preset_memory_map[n_node];
-        if (memory_node.empty()) {
-            cerr<<"ERROR!!! NO MAPPING IMPLEMENTED YET FOR THIS CONFIG"<<endl;
-            assert(0);
-        }
-
-        // create node map
-        unsigned next_node = 0;
-        unsigned memory_node_index = 0;
-        for (unsigned i = 0; i < n_shader; ++i) {
-            while (next_node == memory_node[memory_node_index]) {
-                next_node += 1;
-                memory_node_index += 1;
-            }
-            _node_map[i] = next_node;
-            next_node += 1;
-        }
-        for (unsigned i = n_shader; i < n_shader; ++i) {
-            _node_map[i] = memory_node[i-n_shader];
-        }
-    } else { //not use preset map
-        for (unsigned i=0;i<n_node;i++) {
-            _node_map[i]=i;
-        }
-    }
-
-    for (unsigned i = 0; i < n_node ; i++) {
-        for (unsigned j = 0; j< n_node ; j++) {
-            if ( _node_map[j] == i ) {
-                _reverse_node_map[i]=j;
-                break;
-            }
-        }
     }
 }
