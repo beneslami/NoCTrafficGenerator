@@ -35,6 +35,7 @@ protected:
 public:
     static TrafficGen* result;
     TrafficGen(const Configuration &, const vector<Network *> &);
+    virtual ~TrafficGen();
     void Init();
     static TrafficGen* get_instance(const Configuration &, const vector<Network *> &);
 };
