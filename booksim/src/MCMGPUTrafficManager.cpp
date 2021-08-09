@@ -57,7 +57,7 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
 
     if ( f->head && ( f->dest != dest ) ) {
         std::ostringstream err;
-        std::err << "Flit " << f->id << " arrived at incorrect output " << dest;
+        err << "Flit " << f->id << " arrived at incorrect output " << dest;
         Error( err.str( ) );
     }
 
@@ -117,7 +117,7 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
             _requestsOutstanding[dest]--;
         } else if(f->type == Flit::ANY_TYPE) {
             std::ostringstream err;
-            std::err << "Flit " << f->id << " cannot be ANY_TYPE" ;
+            err << "Flit " << f->id << " cannot be ANY_TYPE" ;
             Error( err.str( ) );
         }
 
@@ -153,8 +153,8 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
     }
 }
 
-void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int subnet, int package_size,
-                                           const Flit::FlitType &packet_type, void *const data, int dest) {
+void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int subnet, int packet_size,
+                                           Flit::FlitType &packet_type, void *const data, int dest) {
     int size = packet_size; //input size
     int pid = _cur_pid++;
     assert(_cur_pid);
@@ -162,7 +162,7 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
     bool record = false;
     bool watch = gWatchOut && (_packets_to_watch.count(pid) > 0);
 
-    if (_use_read_write[cl]) {
+    /*if (_use_read_write[cl]) {
         if (stype > 0) {
             if (stype == 1) {
                 packet_type = Flit::READ_REQUEST;
@@ -172,7 +172,7 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
                 size = _write_request_size[cl];
             } else {
                 std::ostringstream err;
-                std::err << "Invalid packet type: " << packet_type;
+                err << "Invalid packet type: " << packet_type;
                 Error(err.str());
             }
         } else {
@@ -185,7 +185,7 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
                 packet_type = Flit::WRITE_REPLY;
             } else {
                 std::ostringstream err;
-                std::err << "Invalid packet type: " << rinfo->type;
+                err << "Invalid packet type: " << rinfo->type;
                 Error(err.str());
             }
             packet_destination = rinfo->source;
@@ -194,7 +194,7 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
             _repliesPending[source].pop_front();
             rinfo->Free();
         }
-    }
+    }*/
 
     if ((packet_destination <0) || (packet_destination >= _nodes)) {
         std::ostringstream err;

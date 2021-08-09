@@ -5,6 +5,7 @@
 #ifndef MCMGPUTRAFFICMANAGER_H
 #define MCMGPUTRAFFICMANAGER_H
 
+#include <limits>
 #include <vector>
 #include <sstream>
 #include "flit.hpp"
@@ -21,7 +22,7 @@ class MCMGPUTrafficManager : public TrafficManager{
 protected:
     vector<vector<vector<list<Flit *> > > > _input_queue;
     virtual void _RetireFlit( Flit *f, int dest );
-    virtual void _GeneratePacket(int source, int cl, int time, int subnet, int package_size, const Flit::FlitType& packet_type, void* const data, int dest);
+    virtual void _GeneratePacket(int source, int cl, int time, int subnet, int package_size, Flit::FlitType& packet_type, void* const data, int dest);
     virtual void _Step();
 public:
     static MCMGPUTrafficManager *address;
