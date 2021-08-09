@@ -113,7 +113,7 @@ bool Simulate(BookSimConfig const &config) {
     /*tcc and characterize are legacy
      *not sure how to use them
      */
-
+    std::cout <<" you can see me\n";
     assert(trafficManager == NULL);
     trafficManager = TrafficManager::New(config, net);
     std::cout << "main: " << trafficManager << std::endl;
@@ -178,7 +178,6 @@ int main( int argc, char **argv ) {
     } else {
         gWatchOut = new ofstream(watch_out_file.c_str());
     }
-    std::cout <<" you can see me\n";
 
     /*configure and run the simulator
      */
