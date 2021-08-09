@@ -23,6 +23,7 @@ MCMGPUTrafficManager::MCMGPUTrafficManager(const Configuration &config, const ve
             _input_queue[subnet][node].resize(_classes);
         }
     }
+    g_icnt_interface = Interface::get_instance(config, net);
     _time = 0;
     _sim_state = running;
     _ClearStats();
