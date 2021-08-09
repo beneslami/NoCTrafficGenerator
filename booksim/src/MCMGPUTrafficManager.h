@@ -30,7 +30,6 @@ public:
     static MCMGPUTrafficManager* get_instance(const Configuration &config, const vector<Network *> & net);
     MCMGPUTrafficManager(const Configuration &config, const vector<Network *> & net);
     virtual ~MCMGPUTrafficManager();
-    Interface *g_icnt_interface;
 };
 
 #endif
