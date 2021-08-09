@@ -214,8 +214,8 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     int vc;
     std::cout << _vcs << std::endl;
     std::cout << _boundary_buffer_capacity << std::endl;
-    std::cout << _boundary_buffer[subnet][output][vc].Size() << std::endl;
     for (vc=0; vc < _vcs; vc++) {
+        std::cout << _boundary_buffer[subnet][output][vc].Size() << std::endl;
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
             std::cout << "src: " <<  flit->src << "\tdst: " << flit->dest << "\tid: " << flit->id << std::endl;
