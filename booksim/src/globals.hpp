@@ -30,9 +30,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "interface.h"
-/*all declared in main.cpp*/
 
+/*all declared in main.cpp*/
+class Interface;
 Interface *g_icnt_interface;
 
 int GetSimTime();
