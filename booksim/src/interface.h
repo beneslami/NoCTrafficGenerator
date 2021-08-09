@@ -15,10 +15,9 @@
 #include "intersim_config.hpp"
 #include "netstream/messages.h"
 #include "networks/network.hpp"
-#include "MCMGPUTrafficManager.h"
 #include "netstream/socketstream.h"
 
-class TrafficGen;
+class MCMGPUTrafficManager;
 class IntersimConfig;
 
 struct RequestPacket {
