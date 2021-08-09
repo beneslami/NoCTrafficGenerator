@@ -38,7 +38,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _subnets = _icnt_config->GetInt("subnets");
     _vcs = _icnt_config->GetInt("num_vcs");
     _n_shader = 4;  /* for now */
-
+    _flit_size = _icnt_config->GetInt("flit_size");
     _traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
     Init();
 }
@@ -173,21 +173,21 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
     if (_subnets == 1) {
         subnet = 0;
     }
-    Flit::FlitType& type;
+    Flit::FlitType type;
     switch(packet_type){
-        switch 0:{
+        switch(0):{
             type = Flit::FlitType::READ_REQUEST;
             break;
         }
-        switch 1:{
+        switch(1):{
             type = Flit::FlitType::READ_REPLY;
             break;
         }
-        switch 2:{
+        switch(2):{
             type = Flit::FlitType::WRITE_REQUEST;
             break;
         }
-        switch 3:{
+        switch(3):{
             type = Flit::FlitType::WRITE_REPLY;
             break;
         }
@@ -260,7 +260,7 @@ bool Interface::Busy() const {
         for (int s = 0; s < _subnets; ++s) {
             for (unsigned n = 0; n < _n_shader; ++n) {
                 //FIXME: if this cannot make sure _partial_packets is empty
-                assert(_traffic_manager->is_empty(s, n, 0));
+                assert(_traffic_manager->_input_queue[s][n][0].empty());
             }
         }
     } else {

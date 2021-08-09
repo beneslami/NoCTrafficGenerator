@@ -78,6 +78,7 @@ protected:
     int _n_shader;
     int _vcs;
     int _subnets;
+    int _flit_size;
 private:
     SocketStream _listenSocket;
     SocketStream *_channel;
