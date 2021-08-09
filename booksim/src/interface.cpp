@@ -34,6 +34,10 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _input_buffer_capacity = 9;
     }
+    _subnets = _icnt_config->GetInt("subnets");
+    _vcs = _icnt_config->GetInt("num_vcs");
+    _n_shader = 4;  /* for now */
+
     _traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
     Init();
 }
@@ -62,17 +66,13 @@ int Interface::Init() {
 }
 
 int Interface::GetIcntTime() const {
-    //return _traffic_manager->getTime();
-    return 0;
+    return _traffic_manager->getTime();
 }
 
 Stats* Interface::GetIcntStats(const string &name) const {
-    //return _traffic_manager->getStats(name);
-    return 0;
+    return _traffic_manager->getStats(name);
 }
 
-
-/*
 void Interface::_CreateBuffer() {
     unsigned nodes = _n_shader;
 
@@ -93,7 +93,7 @@ void Interface::_CreateBuffer() {
         }
     }
 }
-*/
+
 int Interface::Step() {
     bool process_more = true;
     StreamMessage *msg = NULL;
@@ -140,7 +140,7 @@ int Interface::Step() {
                 else{
                     _res.source = -1;
                     _res.dest = -1;  /* source and destination -1 means no packet to eject */
-                    _res.remainingRequests = 0;
+                    _res.remainingRequests = 0; // needs to be changed
                 }
                 *_channel << _res;
                 break;
@@ -162,11 +162,9 @@ int Interface::Step() {
         StreamMessage::destroy(msg);
     }
 }
-/*
+
 void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int packet_type) {
     assert(HasBuffer(input_deviceID, size));
-    //int output_icntID = _node_map[output_deviceID];
-    //int input_icntID = _node_map[input_deviceID];
     int output_icntID = output_deviceID;
     int input_icntID = input_deviceID;
     unsigned int n_flits = (size / _flit_size) + ((size % _flit_size)? 1:0);
@@ -174,11 +172,33 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
     if (_subnets == 1) {
         subnet = 0;
     }
-    //_traffic_manager->_GeneratePacket( input_icntID, n_flits, 0, _traffic_manager->_time, subnet, packet_type, data, output_icntID);
+    Flit::FlitType& type;
+    switch(packet_type){
+        switch 0:{
+            type = Flit::FlitType::READ_REQUEST;
+            break;
+        }
+        switch 1:{
+            type = Flit::FlitType::READ_REPLY;
+            break;
+        }
+        switch 2:{
+            type = Flit::FlitType::WRITE_REQUEST;
+            break;
+        }
+        switch 3:{
+            type = Flit::FlitType::WRITE_REPLY;
+            break;
+        }
+        default: {
+            type = Flit::FlitType::ANY_TYPE;
+            break;
+        }
+    }
+    _traffic_manager->_GeneratePacket( input_icntID, 0, _traffic_manager->_time, subnet, n_flits, packet_type, data, output_icntID);
 }
 
 void* Interface::pop(unsigned deviceID) {
-    //int icntID = _node_map[deviceID];
     int icntID = deviceID;
     void* data = NULL;
     int subnet = 0;
@@ -202,6 +222,7 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
     _ejection_buffer[subnet][output_icntID][vc].PushFlitData(flit, flit->tail);
 }
 
+
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
@@ -219,6 +240,7 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
         }
     }
 }
+
 
 Flit* Interface::GetEjectedFlit(int subnet, int node){
     Flit* flit = NULL;
@@ -257,24 +279,15 @@ bool Interface::Busy() const {
 
 bool Interface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
-
-      READ_REQUEST  = 0,
-      READ_REPLY    = 1,
-      WRITE_REQUEST = 2,
-      WRITE_REPLY   = 3,
-      ANY_TYPE      = 4
-
     bool has_buffer = false;
     unsigned int n_flits = (unsigned int)(size / _flit_size) + ((size % _flit_size)? 1:0);
-    //int icntID = _node_map.find(deviceID)->second;
     int icntID = deviceID;
-    has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
+    has_buffer = (_traffic_manager->_input_queue[0][icntID][0].size() + n_flits <= _input_buffer_capacity);
     if ((_subnets > 1))
-        has_buffer = (_traffic_manager->get_size(0, icntID, 0) + n_flits <= _input_buffer_capacity);
+        has_buffer = (_traffic_manager->_input_queue[1][icntID][0].size() + n_flits <= _input_buffer_capacity);
     return has_buffer;
-}*/
+}
 
-/*
 void* Interface::_BoundaryBufferItem::PopPacket()
 {
     assert (_packet_n);
@@ -315,4 +328,3 @@ void Interface::_BoundaryBufferItem::PushFlitData(void* data,bool is_tail)
         _packet_n++;
     }
 }
-*/

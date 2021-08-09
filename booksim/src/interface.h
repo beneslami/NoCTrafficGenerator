@@ -8,6 +8,7 @@
 #include <map>
 #include <queue>
 #include <fstream>
+#include "flit.hpp"
 #include "module.hpp"
 #include "globals.hpp"
 #include "config_utils.hpp"
@@ -75,7 +76,9 @@ protected:
         int _packet_n;
     };
     typedef queue<Flit*> _EjectionBufferItem;
-
+    int _n_shader;
+    int _vcs;
+    int _subnets;
 private:
     SocketStream _listenSocket;
     SocketStream *_channel;
