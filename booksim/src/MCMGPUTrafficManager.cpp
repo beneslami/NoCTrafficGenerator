@@ -198,9 +198,9 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
 
     if ((packet_destination <0) || (packet_destination >= _nodes)) {
         std::ostringstream err;
-        std::err << "Incorrect packet destination " << packet_destination
+        err << "Incorrect packet destination " << packet_destination
             << " for stype " << packet_type;
-        Error( std::err.str());
+        Error(err.str());
     }
 
     if ( ( _sim_state == running ) ||
@@ -289,7 +289,7 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
 }
 
 void MCMGPUTrafficManager::_Step() {
-    ool flits_in_flight = false;
+    bool flits_in_flight = false;
     for(int c = 0; c < _classes; ++c) {
         flits_in_flight |= !_total_in_flight_flits[c].empty();
     }
