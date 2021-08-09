@@ -7,6 +7,8 @@
 #include "globals.hpp"
 #include <stddef.h>
 
+class MCMGPUTrafficManager;
+
 Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
     if(interface_result == NULL){
