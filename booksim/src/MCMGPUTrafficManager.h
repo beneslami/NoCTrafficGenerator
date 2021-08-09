@@ -6,6 +6,7 @@
 #define MCMGPUTRAFFICMANAGER_H
 
 #include <vector>
+#include <sstream>
 #include "flit.hpp"
 #include "stats.hpp"
 #include "booksim.hpp"
@@ -14,6 +15,7 @@
 #include "booksim_config.hpp"
 #include "trafficmanager.hpp"
 #include "networks/network.hpp"
+#include "packet_reply_info.hpp"
 
 class MCMGPUTrafficManager : public TrafficManager{
 protected:

@@ -56,8 +56,8 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
     }
 
     if ( f->head && ( f->dest != dest ) ) {
-        ostringstream err;
-        err << "Flit " << f->id << " arrived at incorrect output " << dest;
+        std::ostringstream err;
+        std::err << "Flit " << f->id << " arrived at incorrect output " << dest;
         Error( err.str( ) );
     }
 
@@ -116,8 +116,8 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
         if(f->type == Flit::READ_REPLY || f->type == Flit::WRITE_REPLY  ){
             _requestsOutstanding[dest]--;
         } else if(f->type == Flit::ANY_TYPE) {
-            ostringstream err;
-            err << "Flit " << f->id << " cannot be ANY_TYPE" ;
+            std::ostringstream err;
+            std::err << "Flit " << f->id << " cannot be ANY_TYPE" ;
             Error( err.str( ) );
         }
 
@@ -171,8 +171,8 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
                 packet_type = Flit::WRITE_REQUEST;
                 size = _write_request_size[cl];
             } else {
-                ostringstream err;
-                err << "Invalid packet type: " << packet_type;
+                std::ostringstream err;
+                std::err << "Invalid packet type: " << packet_type;
                 Error(err.str());
             }
         } else {
@@ -184,8 +184,8 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
                 size = _write_reply_size[cl];
                 packet_type = Flit::WRITE_REPLY;
             } else {
-                ostringstream err;
-                err << "Invalid packet type: " << rinfo->type;
+                std::ostringstream err;
+                std::err << "Invalid packet type: " << rinfo->type;
                 Error(err.str());
             }
             packet_destination = rinfo->source;
@@ -197,10 +197,10 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
     }
 
     if ((packet_destination <0) || (packet_destination >= _nodes)) {
-        ostringstream err;
-        err << "Incorrect packet destination " << packet_destination
+        std::ostringstream err;
+        std::err << "Incorrect packet destination " << packet_destination
             << " for stype " << packet_type;
-        Error( err.str( ) );
+        Error( std::err.str());
     }
 
     if ( ( _sim_state == running ) ||
