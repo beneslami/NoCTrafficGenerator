@@ -109,14 +109,14 @@ bool Simulate(BookSimConfig const &config) {
         name << "network_" << i;
         net[i] = Network::New(config, name.str());
     }
-    g_icnt_interface = Interface::get_instance(config, net);
+
     /*tcc and characterize are legacy
      *not sure how to use them
      */
 
     assert(trafficManager == NULL);
     trafficManager = TrafficManager::New(config, net);
-
+    g_icnt_interface = Interface::get_instance(config, net);
     /*Start the simulation run
      */
 
