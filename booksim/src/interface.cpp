@@ -179,7 +179,7 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
         case 1:   type = Flit::READ_REPLY;    break;
         case 2:   type = Flit::WRITE_REQUEST; break;
         case 3:   type = Flit::WRITE_REPLY;   break;
-        default:    type = Flit::ANY_TYPE;      break;
+        default:  type = Flit::ANY_TYPE;      break;
     }
     _traffic_manager->_GeneratePacket( input_icntID, 0, _traffic_manager->_time, subnet, n_flits, packet_type, data, output_icntID);
 }
