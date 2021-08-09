@@ -178,7 +178,7 @@ int main( int argc, char **argv ) {
     } else {
         gWatchOut = new ofstream(watch_out_file.c_str());
     }
-
+    std::cout <<" you can see me\n";
 
     /*configure and run the simulator
      */
