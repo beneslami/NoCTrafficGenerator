@@ -12,6 +12,7 @@
 #include "stats.hpp"
 #include "booksim.hpp"
 #include "globals.hpp"
+#include "interface.h"
 #include "config_utils.hpp"
 #include "booksim_config.hpp"
 #include "trafficmanager.hpp"
@@ -29,6 +30,7 @@ public:
     static MCMGPUTrafficManager* get_instance(const Configuration &config, const vector<Network *> & net);
     MCMGPUTrafficManager(const Configuration &config, const vector<Network *> & net);
     virtual ~MCMGPUTrafficManager();
+    Interface *g_icnt_interface;
 };
 
 #endif
