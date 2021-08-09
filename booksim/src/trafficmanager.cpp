@@ -54,7 +54,6 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
     } else if (sim_type == "batch") {
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
-        std::cout <<" you can see me\n";
         result = MCMGPUTrafficManager::get_instance(config, net);
         std::cout << "trafficManager: " << result << std::endl;
     } else {

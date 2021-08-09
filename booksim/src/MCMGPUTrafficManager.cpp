@@ -7,6 +7,7 @@
 MCMGPUTrafficManager* MCMGPUTrafficManager::address = NULL;
 MCMGPUTrafficManager * MCMGPUTrafficManager::get_instance(const Configuration &config, const vector<Network *> &net) {
     if(address == NULL){
+        std::cout <<" you can see me\n";
         address = new MCMGPUTrafficManager(config, net);
     }
     else{
