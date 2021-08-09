@@ -56,6 +56,7 @@ TrafficManager * TrafficManager::New(Configuration const & config,
     result = new BatchTrafficManager(config, net);
   } else if(sim_type == "mcm_gpu") {
     result = MCMGPUTrafficManager::get_instance(config, net);
+    std::cout << "trafficManager: " << result << std::endl;
   }
   else {
     cerr << "Unknown simulation type: " << sim_type << endl;
