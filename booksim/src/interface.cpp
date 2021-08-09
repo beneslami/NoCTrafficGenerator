@@ -28,7 +28,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _ejection_buffer_capacity = _icnt_config->GetInt( "vc_buf_size" );
     }
-
+    _CreateBuffer();
     _boundary_buffer_capacity = _icnt_config->GetInt( "boundary_buffer_size" ) ;
     assert(_boundary_buffer_capacity);
     if (_icnt_config->GetInt("input_buffer_size")) {
@@ -76,7 +76,6 @@ Stats* Interface::GetIcntStats(const string &name) const {
 
 void Interface::_CreateBuffer() {
     unsigned nodes = _n_shader;
-
     _boundary_buffer.resize(_subnets);
     _ejection_buffer.resize(_subnets);
     _round_robin_turn.resize(_subnets);
@@ -208,7 +207,6 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
     _ejection_buffer[subnet][output_icntID][vc].PushFlitData(flit, flit->tail);
 }
 
-
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
@@ -229,7 +227,6 @@ void Interface::Transfer2BoundaryBuffer(int subnet, int output){
         }
     }
 }
-
 
 Flit* Interface::GetEjectedFlit(int subnet, int node){
     Flit* flit = NULL;
