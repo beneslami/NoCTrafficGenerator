@@ -33,7 +33,7 @@
 
 /*all declared in main.cpp*/
 class Interface;
-Interface *g_icnt_interface;
+extern Interface *g_icnt_interface;
 
 int GetSimTime();
 
