@@ -175,26 +175,11 @@ void Interface::push(unsigned input_deviceID, unsigned output_deviceID, void *da
     }
     Flit::FlitType type;
     switch(packet_type){
-        switch(0):{
-            type = Flit::FlitType::READ_REQUEST;
-            break;
-        }
-        switch(1):{
-            type = Flit::FlitType::READ_REPLY;
-            break;
-        }
-        switch(2):{
-            type = Flit::FlitType::WRITE_REQUEST;
-            break;
-        }
-        switch(3):{
-            type = Flit::FlitType::WRITE_REPLY;
-            break;
-        }
-        default: {
-            type = Flit::FlitType::ANY_TYPE;
-            break;
-        }
+        switch 0:   type = Flit::READ_REQUEST;  break;
+        switch 1:   type = Flit::READ_REPLY;    break;
+        switch 2:   type = Flit::WRITE_REQUEST; break;
+        switch 3:   type = Flit::WRITE_REPLY;   break;
+        default:    type = Flit::ANY_TYPE;      break;
     }
     _traffic_manager->_GeneratePacket( input_icntID, 0, _traffic_manager->_time, subnet, n_flits, packet_type, data, output_icntID);
 }
