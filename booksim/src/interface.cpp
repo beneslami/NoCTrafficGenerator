@@ -40,7 +40,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _n_shader = 4;  /* for now */
     _flit_size = _icnt_config->GetInt("flit_size");
     _traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
-    std::cout << "Interface: " << result << std::endl;
+    std::cout << "Interface: " << _traffic_manager << std::endl;
     Init();
 }
 
