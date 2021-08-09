@@ -116,7 +116,6 @@ bool Simulate(BookSimConfig const &config) {
 
     assert(trafficManager == NULL);
     trafficManager = TrafficManager::New(config, net);
-    std::cout << "main: " << trafficManager << std::endl;
     /*Start the simulation run
      */
 

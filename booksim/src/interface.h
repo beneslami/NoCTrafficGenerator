@@ -68,7 +68,7 @@ protected:
         void* PopPacket();
         void* TopPacket() const;
         void PushFlitData(void* data,bool is_tail);
-        bool empty(){ return _packet_n == 0 ? true : false; }
+        bool empty();
     private:
         queue<void *> _buffer;
         queue<bool> _tail_flag;

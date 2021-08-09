@@ -40,7 +40,6 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _vcs = _icnt_config->GetInt("num_vcs");
     _n_shader = 4;  /* for now */
     _flit_size = _icnt_config->GetInt("flit_size");
-    //_traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
     Init();
 }
 
@@ -213,6 +212,9 @@ void Interface::WriteOutBuffer(int subnet, int output_icntID, Flit *flit) {
 void Interface::Transfer2BoundaryBuffer(int subnet, int output){
     Flit* flit;
     int vc;
+    std::cout << _vcs << std::endl;
+    std::cout << _boundary_buffer_capacity << std::endl;
+    std::cout << _boundary_buffer[subnet][output][vc].Size() << std::endl;
     for (vc=0; vc < _vcs; vc++) {
         if ( !_ejection_buffer[subnet][output][vc].empty() && _boundary_buffer[subnet][output][vc].Size() < _boundary_buffer_capacity ) {
             flit = (Flit*)(_ejection_buffer[subnet][output][vc].TopPacket());
@@ -313,5 +315,14 @@ void Interface::_BoundaryBufferItem::PushFlitData(void* data,bool is_tail)
     _tail_flag.push(is_tail);
     if (is_tail) {
         _packet_n++;
+    }
+}
+
+bool Interface::_BoundaryBufferItem::empty() {
+    if(_packet_n == 0){
+        return true;
+    }
+    else{
+        return false;
     }
 }
