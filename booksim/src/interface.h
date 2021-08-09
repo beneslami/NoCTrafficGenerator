@@ -85,7 +85,7 @@ private:
     std::string _host;
     int _port;
     IntersimConfig* _icnt_config;
-    MCMGPUTrafficManager *_traffic_manager;
+    //MCMGPUTrafficManager *_traffic_manager;
     map<unsigned, unsigned> _node_map;
     map<unsigned, unsigned> _reverse_node_map;
     vector<vector<int> > _round_robin_turn;

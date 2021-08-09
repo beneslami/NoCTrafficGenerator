@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include "MCMGPUTrafficManager.h"
 
+extern MCMGPUTrafficManager *_traffic_manager;
 Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
     if(interface_result == NULL){
@@ -39,8 +40,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _vcs = _icnt_config->GetInt("num_vcs");
     _n_shader = 4;  /* for now */
     _flit_size = _icnt_config->GetInt("flit_size");
-    _traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
-    std::cout << "Interface: " << _traffic_manager << std::endl;
+    //_traffic_manager = MCMGPUTrafficManager::get_instance(config, net);
     Init();
 }
 

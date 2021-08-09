@@ -44,6 +44,7 @@
 #include "interface.h"
 
 extern Interface *g_icnt_interface;
+MCMGPUTrafficManager *_traffic_manager;
 
 TrafficManager * TrafficManager::New(Configuration const & config, vector<Network *> const & net)
 {
@@ -55,7 +56,7 @@ TrafficManager * TrafficManager::New(Configuration const & config, vector<Networ
         result = new BatchTrafficManager(config, net);
     } else if (sim_type == "mcm_gpu") {
         result = MCMGPUTrafficManager::get_instance(config, net);
-        std::cout << "trafficManager: " << result << std::endl;
+        _traffic_manager = result;
     } else {
         cerr << "Unknown simulation type: " << sim_type << endl;
     }

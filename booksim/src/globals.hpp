@@ -35,6 +35,9 @@
 class Interface;
 extern Interface *g_icnt_interface;
 
+class MCMGPUTrafficManager;
+extern MCMGPUTrafficManager *_traffic_manager;
+
 int GetSimTime();
 
 class Stats;
