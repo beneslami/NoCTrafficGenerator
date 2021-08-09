@@ -45,23 +45,22 @@
 
 extern Interface *g_icnt_interface;
 
-TrafficManager * TrafficManager::New(Configuration const & config,
-                                     vector<Network *> const & net)
+TrafficManager * TrafficManager::New(Configuration const & config, vector<Network *> const & net)
 {
-  TrafficManager * result = NULL;
-  string sim_type = config.GetStr("sim_type");
-  if((sim_type == "latency") || (sim_type == "throughput")) {
-    result = new TrafficManager(config, net);
-  } else if(sim_type == "batch") {
-    result = new BatchTrafficManager(config, net);
-  } else if(sim_type == "mcm_gpu") {
-    result = MCMGPUTrafficManager::get_instance(config, net);
-    std::cout << "trafficManager: " << result << std::endl;
-  }
-  else {
-    cerr << "Unknown simulation type: " << sim_type << endl;
-  } 
-  return result;
+    TrafficManager *result = NULL;
+    string sim_type = config.GetStr("sim_type");
+    if ((sim_type == "latency") || (sim_type == "throughput")) {
+        result = new TrafficManager(config, net);
+    } else if (sim_type == "batch") {
+        result = new BatchTrafficManager(config, net);
+    } else if (sim_type == "mcm_gpu") {
+        std::cout <<" you can see me\n";
+        result = MCMGPUTrafficManager::get_instance(config, net);
+        std::cout << "trafficManager: " << result << std::endl;
+    } else {
+        cerr << "Unknown simulation type: " << sim_type << endl;
+    }
+    return result;
 }
 
 TrafficManager::TrafficManager( const Configuration &config, const vector<Network *> & net )

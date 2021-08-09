@@ -113,7 +113,7 @@ bool Simulate(BookSimConfig const &config) {
     /*tcc and characterize are legacy
      *not sure how to use them
      */
-    std::cout <<" you can see me\n";
+
     assert(trafficManager == NULL);
     trafficManager = TrafficManager::New(config, net);
     std::cout << "main: " << trafficManager << std::endl;
