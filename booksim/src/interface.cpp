@@ -28,7 +28,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     } else {
         _ejection_buffer_capacity = _icnt_config->GetInt( "vc_buf_size" );
     }
-    _CreateBuffer();
+
     _boundary_buffer_capacity = _icnt_config->GetInt( "boundary_buffer_size" ) ;
     assert(_boundary_buffer_capacity);
     if (_icnt_config->GetInt("input_buffer_size")) {
@@ -40,6 +40,7 @@ Interface::Interface(const Configuration &config, const vector<Network *> &net) 
     _vcs = _icnt_config->GetInt("num_vcs");
     _n_shader = 4;  /* for now */
     _flit_size = _icnt_config->GetInt("flit_size");
+    _CreateBuffer();
     Init();
 }
 
