@@ -136,6 +136,7 @@ void TrafficGenerator::Eject() {
     EjectResMsg response;
     bool hasRequests = true;
     for(int i = 0 ; i < _numCore; i++) {
+        request.coreNum = i;
         while (hasRequests) {
             m_channel << request >> response;
             if (response.msgType == READ_REQUEST || response.msgType == WRITE_REQUEST) {

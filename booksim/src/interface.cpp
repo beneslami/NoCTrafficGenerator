@@ -108,7 +108,7 @@ int Interface::Step() {
             }
             case INJECT_REQ: {
                 InjectReqMsg *req = (InjectReqMsg *) msg;
-                //push(req->source, req->dest, (void *) req, req->size, req->msgType);
+                push(req->source, req->dest, (void *) req, req->size, req->msgType);
                 std::cout << "source: " << req->source << "\tdest: " << req->dest << "\tsize: " << req->size << "\tid: "<< req->id << " is received"<< std::endl;
                 InjectResMsg res;
                 res.type = ACKNOWLEDGE;
@@ -117,7 +117,7 @@ int Interface::Step() {
             }
             case INJECT_RES: {
                 InjectResMsg *resInject = (InjectResMsg *) msg;
-                //push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
+                push(resInject->source, resInject->dest, (void *) resInject, resInject->size, resInject->msgType);
                 std::cout << "source: " << resInject->source << "\tdest: " << resInject->dest << "\tsize: " << resInject->size << "\tid: "<< resInject->id << " is received"<< std::endl;
                 InjectResMsg resAck;
                 resAck.type = ACKNOWLEDGE;
@@ -126,8 +126,7 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
-                Flit* f = NULL;
-                //Flit* f = (Flit*)(pop(ejReq->size));
+                Flit* f = (Flit*)(pop(ejReq->coreNum));
                 EjectResMsg _res;
                 if(f) {
                     _res.source = f->src;
