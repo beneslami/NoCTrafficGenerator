@@ -111,7 +111,6 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
             } else if (f->type == Flit::ANY_TYPE) {
                 _requestsOutstanding[f->src]--;
             }
-
         }
 
         if(f->type == Flit::READ_REPLY || f->type == Flit::WRITE_REPLY  ){
@@ -119,7 +118,7 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
         } else if(f->type == Flit::ANY_TYPE) {
             std::ostringstream err;
             err << "Flit " << f->id << " cannot be ANY_TYPE" ;
-            Error( err.str( ) );
+            Error( err.str());
         }
 
         // Only record statistics once per packet (at tail)
@@ -144,7 +143,6 @@ void MCMGPUTrafficManager::_RetireFlit(Flit *f, int dest) {
         if(f != head) {
             head->Free();
         }
-
     }
 
     if(f->head && !f->tail) {
@@ -301,10 +299,10 @@ void MCMGPUTrafficManager::_Step() {
 
     vector<map<int, Flit *> > flits(_subnets);
 
-    for ( int subnet = 0; subnet < _subnets; ++subnet ) {
+    for (int subnet = 0; subnet < _subnets; ++subnet) {
         for ( int n = 0; n < _nodes; ++n ) {
-            Flit * const f = _net[subnet]->ReadFlit( n );
-            if ( f ) {
+            Flit * const f = _net[subnet]->ReadFlit(n);
+            if (f) {
                 if(f->watch) {
                     *gWatchOut << GetSimTime() << " | "
                                << "node" << n << " | "
@@ -315,7 +313,6 @@ void MCMGPUTrafficManager::_Step() {
                 }
                 g_icnt_interface->WriteOutBuffer(subnet, n, f);
             }
-
             g_icnt_interface->Transfer2BoundaryBuffer(subnet, n);
             Flit* const ejected_flit = g_icnt_interface->GetEjectedFlit(subnet, n);
             if (ejected_flit) {
@@ -372,8 +369,7 @@ void MCMGPUTrafficManager::_Step() {
             int class_limit = _classes;
             if(_hold_switch_for_packet) {
                 list<Flit *> const & pp = _input_queue[subnet][n][last_class];
-                if(!pp.empty() && !pp.front()->head &&
-                   !dest_buf->IsFullFor(pp.front()->vc)) {
+                if(!pp.empty() && !pp.front()->head && !dest_buf->IsFullFor(pp.front()->vc)) {
                     f = pp.front();
                     assert(f->vc == _last_vc[n][subnet][last_class]);
                     --class_limit;
@@ -433,12 +429,12 @@ void MCMGPUTrafficManager::_Step() {
                                    << "Finding output VC for flit " << cf->id
                                    << ":" << endl;
                     }
-                    for(int i = 1; i <= vc_count; ++i) {
+                    for(int j = 1; j <= vc_count; ++j) {
                         int const lvc = _last_vc[n][subnet][c];
                         int const vc =
                                 (lvc < vc_start || lvc > vc_end) ?
                                 vc_start :
-                                (vc_start + (lvc - vc_start + i) % vc_count);
+                                (vc_start + (lvc - vc_start + j) % vc_count);
                         assert((vc >= vc_start) && (vc <= vc_end));
                         if(!dest_buf->IsAvailableFor(vc)) {
                             if(cf->watch) {
@@ -579,10 +575,9 @@ void MCMGPUTrafficManager::_Step() {
         }
         flits[subnet].clear();
         // _InteralStep here
-        _net[subnet]->Evaluate( );
-        _net[subnet]->WriteOutputs( );
+        _net[subnet]->Evaluate();
+        _net[subnet]->WriteOutputs();
     }
-
     g_icnt_interface->Step();
 
     ++_time;
