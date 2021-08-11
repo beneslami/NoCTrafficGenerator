@@ -121,9 +121,8 @@ struct EjectReqMsg: StreamMessage
     {
         size = sizeof(EjectReqMsg);
         type = EJECT_REQ;
-        int coreNum;
     }
-
+    int coreNum;
 };
 
 struct EjectResMsg: StreamMessage
