@@ -38,6 +38,7 @@ extern Interface *g_icnt_interface;
 class MCMGPUTrafficManager;
 extern MCMGPUTrafficManager *_traffic_manager;
 
+extern int quit_flag;
 int GetSimTime();
 
 class Stats;

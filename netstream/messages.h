@@ -151,6 +151,7 @@ struct QuitReqMsg: StreamMessage
         size = sizeof(QuitReqMsg);
         type = QUIT_REQ;
     }
+    int flag;
 };
 
 struct QuitResMsg: StreamMessage

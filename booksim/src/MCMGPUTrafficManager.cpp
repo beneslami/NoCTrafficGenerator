@@ -353,7 +353,8 @@ void MCMGPUTrafficManager::_Step() {
     }
 
 #if 1
-    g_icnt_interface->Step();
+    if(!quit_flag)
+        g_icnt_interface->Step();
 #endif
 
     for(int subnet = 0; subnet < _subnets; ++subnet) {
@@ -573,7 +574,8 @@ void MCMGPUTrafficManager::_Step() {
         _net[subnet]->Evaluate();
         _net[subnet]->WriteOutputs();
     }
-    g_icnt_interface->Step();
+    if(!quit_flag)
+        g_icnt_interface->Step();
 
     ++_time;
     assert(_time);

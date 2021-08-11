@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include "MCMGPUTrafficManager.h"
 
+int quit_flag = 0;
 extern MCMGPUTrafficManager *_traffic_manager;
 Interface* Interface::interface_result = NULL;
 Interface* Interface::get_instance(Configuration const & config, vector<Network *> const & net) {
@@ -150,8 +151,11 @@ int Interface::Step() {
                 break;
             }
             case QUIT_REQ: {
+                QuitReqMsg *quitReq = (QuitReqMsg*)msg;
                 QuitResMsg quit;
-                std::cout << "Quit happens\n";
+                if(quitReq == 1){
+                    quit_flag = 1;
+                }
                 *_channel << quit;
                 return 1;
                 break;
