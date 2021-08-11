@@ -208,9 +208,6 @@ void MCMGPUTrafficManager::_GeneratePacket(int source, int cl, int time, int sub
     }
 
     int subnetwork = subnet;
-    //                ((packet_type == Flit::ANY_TYPE) ?
-    //                    RandomInt(_subnets-1) :
-    //                    _subnet[packet_type]);
 
     if ( watch ) {
         *gWatchOut << GetSimTime() << " | "
@@ -380,9 +377,11 @@ void MCMGPUTrafficManager::_Step() {
                 int const c = (last_class + i) % _classes;
                 list<Flit *> const & pp = _input_queue[subnet][n][c];
                 if(pp.empty()) {
+                    std:cout << "It's empty bro\n";
                     continue;
                 }
                 Flit * const cf = pp.front();
+                std::cout << "it's not- id: " << cf->id << std::endl;
                 assert(cf);
                 assert(cf->cl == c);
                 assert(cf->subnetwork == subnet);
