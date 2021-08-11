@@ -151,6 +151,7 @@ int Interface::Step() {
             }
             case QUIT_REQ: {
                 QuitResMsg quit;
+                std::cout << "Quit happens\n";
                 *_channel << quit;
                 return 1;
                 break;

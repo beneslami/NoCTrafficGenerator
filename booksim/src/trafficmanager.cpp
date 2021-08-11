@@ -1152,13 +1152,9 @@ void TrafficManager::_Step( )
             }
 
             if (f) {
-
                 assert(f->subnetwork == subnet);
-
                 int const c = f->cl;
-
                 if (f->head) {
-
                     if (_lookahead_routing) {
                         if (!_noq) {
                             const FlitChannel *inject = _net[subnet]->GetInject(n);
