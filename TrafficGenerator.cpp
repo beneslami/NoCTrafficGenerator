@@ -132,10 +132,10 @@ TrafficGenerator::~TrafficGenerator() {
 
 void TrafficGenerator::Eject() {
 #if CONNECT
-    EjectReqMsg request;
-    EjectResMsg response;
-    bool hasRequests = true;
     for(int i = 0 ; i < _numCore; i++) {
+        EjectReqMsg request;
+        EjectResMsg response;
+        bool hasRequests = true;
         request.coreNum = i;
         while (hasRequests) {
             m_channel << request >> response;
