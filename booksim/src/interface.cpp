@@ -127,7 +127,6 @@ int Interface::Step() {
             }
             case EJECT_REQ: {
                 EjectReqMsg *ejReq =(EjectReqMsg *) msg;
-                std::cout << ejReq->coreNum << std::endl;
                 Flit* f = (Flit*)(pop(ejReq->coreNum));
                 EjectResMsg _res;
                 if(f) {
@@ -137,6 +136,7 @@ int Interface::Step() {
                     _res.id = f->id;
                     _res.network = f->subnetwork;
                     _res.cl = f->cl;
+                    _res.remainingRequests = 1;
                 }
                 else{
                     _res.source = -1;
