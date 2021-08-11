@@ -36,7 +36,7 @@ void connect() {
 #endif
 }
 
-void exit() {
+void _exit() {
 #if CONNECT
     // Notify network we are quitting
 	QuitReqMsg req;
@@ -237,7 +237,6 @@ void TrafficGenerator::Run() {
                 }
                 i++;
             }
-            std::cout << "cycle: " << cycle << std::endl;
             Inject();
             Eject();
             cycle += threshold;
@@ -248,7 +247,7 @@ void TrafficGenerator::Run() {
 		    m_channel << req >> res;
 #endif
         }
-        exit();
+        _exit();
     }
 
 }

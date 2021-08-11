@@ -1611,86 +1611,86 @@ bool TrafficManager::_SingleSim( )
 
 bool TrafficManager::Run( )
 {
-  for ( int sim = 0; sim < _total_sims; ++sim ) {
-    
-    _time = 0;
-    
-    //remove any pending request from the previous simulations
-    _requestsOutstanding.assign(_nodes, 0);
-    for (int i=0;i<_nodes;i++) {
-      while(!_repliesPending[i].empty()) {
-        _repliesPending[i].front()->Free();
-        _repliesPending[i].pop_front();
-      }
+    for (int sim = 0; sim < _total_sims; ++sim) {
+
+        _time = 0;
+
+        //remove any pending request from the previous simulations
+        _requestsOutstanding.assign(_nodes, 0);
+        for (int i = 0; i < _nodes; i++) {
+            while (!_repliesPending[i].empty()) {
+                _repliesPending[i].front()->Free();
+                _repliesPending[i].pop_front();
+            }
+        }
+
+        //reset queuetime for all sources
+        for (int s = 0; s < _nodes; ++s) {
+            _qtime[s].assign(_classes, 0);
+            _qdrained[s].assign(_classes, false);
+        }
+
+        // warm-up ...
+        // reset stats, all packets after warmup_time marked
+        // converge
+        // draing, wait until all packets finish
+        _sim_state = warming_up;
+
+        _ClearStats();
+
+        for (int c = 0; c < _classes; ++c) {
+            _traffic_pattern[c]->reset();
+            _injection_process[c]->reset();
+        }
+
+        if (!_SingleSim()) {
+            cout << "Simulation unstable, ending ..." << endl;
+            return false;
+        }
+
+        // Empty any remaining packets
+        cout << "Draining remaining packets ..." << endl;
+        _empty_network = true;
+        int empty_steps = 0;
+
+        bool packets_left = false;
+        for (int c = 0; c < _classes; ++c) {
+            packets_left |= !_total_in_flight_flits[c].empty();
+        }
+
+        while (packets_left) {
+            _Step();
+
+            ++empty_steps;
+
+            if (empty_steps % 1000 == 0) {
+                //_DisplayRemaining( );
+            }
+
+            packets_left = false;
+            for (int c = 0; c < _classes; ++c) {
+                packets_left |= !_total_in_flight_flits[c].empty();
+            }
+        }
+        //wait until all the credits are drained as well
+        while (Credit::OutStanding() != 0) {
+            _Step();
+        }
+        _empty_network = false;
+
+        //for the love of god don't ever say "Time taken" anywhere else
+        //the power script depend on it
+        cout << "Time taken is " << _time << " cycles" << endl;
+
+        if (_stats_out) {
+            WriteStats(*_stats_out);
+        }
+        _UpdateOverallStats();
     }
-    
-    //reset queuetime for all sources
-    for ( int s = 0; s < _nodes; ++s ) {
-      _qtime[s].assign(_classes, 0);
-      _qdrained[s].assign(_classes, false);
-    }
-    
-    // warm-up ...
-    // reset stats, all packets after warmup_time marked
-    // converge
-    // draing, wait until all packets finish
-    _sim_state    = warming_up;
-    
-    _ClearStats( );
-    
-    for(int c = 0; c < _classes; ++c) {
-      _traffic_pattern[c]->reset();
-      _injection_process[c]->reset();
-    }
-    
-    if ( !_SingleSim( ) ) {
-      cout << "Simulation unstable, ending ..." << endl;
-      return false;
-    }
-    
-    // Empty any remaining packets
-    cout << "Draining remaining packets ..." << endl;
-    _empty_network = true;
-    int empty_steps = 0;
-    
-    bool packets_left = false;
-    for(int c = 0; c < _classes; ++c) {
-      packets_left |= !_total_in_flight_flits[c].empty();
-    }
-    
-    while( packets_left ) {
-      _Step( );
-      
-      ++empty_steps;
-      
-      if ( empty_steps % 1000 == 0 ) {
-        //_DisplayRemaining( );
-      }
-      
-      packets_left = false;
-      for(int c = 0; c < _classes; ++c) {
-        packets_left |= !_total_in_flight_flits[c].empty();
-      }
-    }
-    //wait until all the credits are drained as well
-    while(Credit::OutStanding()!=0){
-      _Step();
-    }
-    _empty_network = false;
-    
-    //for the love of god don't ever say "Time taken" anywhere else
-    //the power script depend on it
-    cout << "Time taken is " << _time << " cycles" <<endl;
-    
-    if(_stats_out) {
-      WriteStats(*_stats_out);
-    }
-    _UpdateOverallStats();
-  }
   
-  //DisplayOverallStats();
+  DisplayOverallStats();
   if(_print_csv_results) {
-    //DisplayOverallStatsCSV();
+    DisplayOverallStatsCSV();
   }
   
   return true;
