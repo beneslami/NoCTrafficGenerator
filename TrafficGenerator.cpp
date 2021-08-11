@@ -43,6 +43,10 @@ void _exit() {
 	req.flag = 1;
 	QuitResMsg res;
 	m_channel << req >> res;
+	while(res.flag != 1){
+	    m_channel >> res;
+	}
+	std::cout << "finish\n";
 #endif
 }
 

@@ -155,6 +155,7 @@ int Interface::Step() {
                 QuitResMsg quit;
                 if(quitReq->flag == 1){
                     quit_flag = 1;
+                    quit.flag = 1;
                 }
                 *_channel << quit;
                 return 1;
