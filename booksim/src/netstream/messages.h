@@ -21,9 +21,8 @@ struct StreamMessage
 {
     int size;
     int type;
-    int coreNum;
     StreamMessage() :
-        size(-1), type(INVALID_MESSAGE), coreNum(-1)
+        size(-1), type(INVALID_MESSAGE)
     {
     }
 
@@ -122,7 +121,7 @@ struct EjectReqMsg: StreamMessage
     {
         size = sizeof(EjectReqMsg);
         type = EJECT_REQ;
-        coreNum = -1;
+        int coreNum;
     }
 };
 
