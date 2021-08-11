@@ -122,6 +122,7 @@ struct EjectReqMsg: StreamMessage
     {
         size = sizeof(EjectReqMsg);
         type = EJECT_REQ;
+        coreNum = -1;
     }
 };
 
