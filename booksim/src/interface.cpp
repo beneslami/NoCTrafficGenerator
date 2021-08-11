@@ -153,7 +153,7 @@ int Interface::Step() {
             case QUIT_REQ: {
                 QuitReqMsg *quitReq = (QuitReqMsg*)msg;
                 QuitResMsg quit;
-                if(quitReq == 1){
+                if(quitReq->flag == 1){
                     quit_flag = 1;
                 }
                 *_channel << quit;
