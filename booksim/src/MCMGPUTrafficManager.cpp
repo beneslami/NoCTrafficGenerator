@@ -16,7 +16,7 @@ MCMGPUTrafficManager * MCMGPUTrafficManager::get_instance(const Configuration &c
 }
 
 MCMGPUTrafficManager::MCMGPUTrafficManager(const Configuration &config, const vector<Network *> &net) : TrafficManager(config, net){
-    _subnets = 4;
+    _subnets = 2;
     _nodes = 10;
     _input_queue.resize(_subnets);
 
