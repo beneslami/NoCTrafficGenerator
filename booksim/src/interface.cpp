@@ -109,6 +109,7 @@ int Interface::Step() {
                     //quit_flag = 1;
                 }
                 else{
+                    std::cout << "time: " <<  _traffic_manager->get_cycleTime() << std::endl;
                     step.go_on = 1;
                     quit_flag = 0;
                 }

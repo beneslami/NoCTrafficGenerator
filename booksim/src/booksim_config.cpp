@@ -278,7 +278,7 @@ BookSimConfig::BookSimConfig( )
 
   _int_map["deadlock_warn_timeout"] = 16384; // jasonjk increased from 256 to 16384
 
-  _int_map["viewer_trace"] = 1;
+  _int_map["viewer_trace"] = 0;
 
   AddStrField("watch_file", "");
   
