@@ -251,7 +251,14 @@ void TrafficGenerator::Run() {
 		    }
 #endif
         }
-        _exit();
+        QuitReqMsg quit_req;
+        quit_req.flag = 1;
+        QuitResMsg quit_res;
+        m_channel << quit_req >> quit_res;
+        while(quit_res.flag != 1){
+            Eject();
+        }
+        //_exit();
     }
 
 }
