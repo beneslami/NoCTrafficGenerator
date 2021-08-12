@@ -106,6 +106,7 @@ int Interface::Step() {
                 StepResMsg step;
                 if(_traffic_manager->get_cycleTime() == 20){
                     step.go_on = 1;
+                    quit_flag = 1;
                 }
                 *_channel << step;
                 process_more = false;
