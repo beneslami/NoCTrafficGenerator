@@ -104,6 +104,9 @@ int Interface::Step() {
         switch(msg->type){
             case STEP_REQ: {
                 StepResMsg step;
+                if(_traffic_manager->get_cycleTime() == 20){
+                    step.go_on = 1;
+                }
                 *_channel << step;
                 process_more = false;
                 break;
@@ -153,10 +156,6 @@ int Interface::Step() {
             case QUIT_REQ: {
                 QuitReqMsg *quitReq = (QuitReqMsg*)msg;
                 QuitResMsg quit;
-                if(quitReq->flag == 1){
-                    quit_flag = 1;
-                    quit.flag = 1;
-                }
                 *_channel << quit;
                 return 1;
                 break;

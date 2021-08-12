@@ -6,6 +6,7 @@
 #define GLOBALS_H
 
 #include <map>
+#include <vector>
 #include <iostream>
 #include "netstream/messages.h"
 

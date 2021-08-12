@@ -223,7 +223,9 @@ void TrafficGenerator::Run() {
             RandomGenerator::CustomDistribution temp = RandomGenerator::CustomDistribution(it->second);
             inter_arrival.insert(std::pair<int, RandomGenerator::CustomDistribution>(it->first, temp));
         }
-        while(cycle < numCycles) {
+        StepReqMsg req;
+        StepResMsg res;
+        while(true) {
             int byteInject = byte.Generate();
             while(byteInject == 0){
                 byteInject = byte.Generate();
@@ -247,9 +249,10 @@ void TrafficGenerator::Run() {
             cycle += threshold;
 
 #if CONNECT
-            StepReqMsg req;
-		    StepResMsg res;
 		    m_channel << req >> res;
+		    if(res.go_on == 0){
+		        break;
+		    }
 #endif
         }
         _exit();

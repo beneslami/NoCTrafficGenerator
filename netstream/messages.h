@@ -79,6 +79,7 @@ struct StepResMsg: StreamMessage
         size = sizeof(StepResMsg);
         type = STEP_RES;
     }
+    int go_on;
 };
 
 struct InjectReqMsg: StreamMessage
@@ -151,7 +152,6 @@ struct QuitReqMsg: StreamMessage
         size = sizeof(QuitReqMsg);
         type = QUIT_REQ;
     }
-    int flag;
 };
 
 struct QuitResMsg: StreamMessage
