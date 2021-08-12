@@ -104,7 +104,7 @@ int Interface::Step() {
         switch(msg->type){
             case STEP_REQ: {
                 StepResMsg step;
-                if(_traffic_manager->get_cycleTime() == 20){
+                if(_traffic_manager->get_cycleTime() == 30){
                     step.go_on = 0;
                     //quit_flag = 1;
                 }
